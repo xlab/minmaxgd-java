@@ -11,20 +11,20 @@ public class GD implements Comparable<GD> {
     final private int d;
 
 
-    public String getG() {
-        return (this.g == Constants.Infinity) ? ("inf") : ((this.g == Constants._Infinity) ? ("-inf") : ("" + this.g));
+    public int getG() {
+        return g;
     }
 
-    public String getD() {
-        return (this.d == Constants.Infinity) ? ("inf") : ((this.d == Constants._Infinity) ? ("-inf") : ("" + this.d));
+    public int getD() {
+        return d;
     }
 
     /**
      * Constructor 0: (g,d) = (+∞,-∞)
      */
     public GD() {
-        this.g = Constants.Infinity;
-        this.d = Constants._Infinity;
+        this.g = Constants.INFINITY;
+        this.d = Constants._INFINITY;
     }
 
     /**
@@ -63,12 +63,12 @@ public class GD implements Comparable<GD> {
         if (gd2.g > this.g)
             g = gd2.g;
         else
-            g = Constants.Infinity;
+            g = Constants.INFINITY;
 
         if (gd2.d < this.d)
             d = gd2.d;
         else
-            d = Constants._Infinity;
+            d = Constants._INFINITY;
 
 
         return new GD(g, d);
@@ -76,17 +76,17 @@ public class GD implements Comparable<GD> {
 
     public GD otimes(GD gd2) {
         int g, d;
-        if (this.g == Constants._Infinity || gd2.g == Constants._Infinity)
-            g = Constants._Infinity;
-        else if (this.g == Constants.Infinity || gd2.g == Constants.Infinity)
-            g = Constants.Infinity;
+        if (this.g == Constants._INFINITY || gd2.g == Constants._INFINITY)
+            g = Constants._INFINITY;
+        else if (this.g == Constants.INFINITY || gd2.g == Constants.INFINITY)
+            g = Constants.INFINITY;
         else
             g = this.g + gd2.g;
 
-        if (this.d == Constants._Infinity || gd2.d == Constants._Infinity)
-            d = Constants._Infinity;
-        else if (this.d == Constants.Infinity || gd2.d == Constants.Infinity)
-            d = Constants.Infinity;
+        if (this.d == Constants._INFINITY || gd2.d == Constants._INFINITY)
+            d = Constants._INFINITY;
+        else if (this.d == Constants.INFINITY || gd2.d == Constants.INFINITY)
+            d = Constants.INFINITY;
         else d = this.d + gd2.d;
 
         return new GD(g, d);
@@ -95,20 +95,20 @@ public class GD implements Comparable<GD> {
     public GD frac(GD gd2) {
         int g, d;
         switch (this.g) {
-            case Constants._Infinity:
-                g = Constants._Infinity;
+            case Constants._INFINITY:
+                g = Constants._INFINITY;
                 break;
-            case Constants.Infinity:
-                if (gd2.g == Constants.Infinity) g = Constants._Infinity;
-                else g = Constants.Infinity;
+            case Constants.INFINITY:
+                if (gd2.g == Constants.INFINITY) g = Constants._INFINITY;
+                else g = Constants.INFINITY;
                 break;
             default:
                 switch (gd2.g) {
-                    case Constants.Infinity:
-                        g = Constants._Infinity;
+                    case Constants.INFINITY:
+                        g = Constants._INFINITY;
                         break;
-                    case Constants._Infinity:
-                        g = Constants.Infinity;
+                    case Constants._INFINITY:
+                        g = Constants.INFINITY;
                         break;
                     default:
                         g = this.g - gd2.g;
@@ -116,20 +116,20 @@ public class GD implements Comparable<GD> {
         }
 
         switch (this.d) {
-            case Constants.Infinity:
-                d = Constants.Infinity;
+            case Constants.INFINITY:
+                d = Constants.INFINITY;
                 break;
-            case Constants._Infinity:
-                if (gd2.d == Constants._Infinity) d = Constants.Infinity;
-                else d = Constants._Infinity;
+            case Constants._INFINITY:
+                if (gd2.d == Constants._INFINITY) d = Constants.INFINITY;
+                else d = Constants._INFINITY;
                 break;
             default:
                 switch (gd2.d) {
-                    case Constants._Infinity:
-                        d = Constants.Infinity;
+                    case Constants._INFINITY:
+                        d = Constants.INFINITY;
                         break;
-                    case Constants.Infinity:
-                        d = Constants._Infinity;
+                    case Constants.INFINITY:
+                        d = Constants._INFINITY;
                         break;
                     default:
                         d = this.d - gd2.d;
@@ -141,6 +141,7 @@ public class GD implements Comparable<GD> {
 
     @Override
     public String toString() {
-        return " g^" + this.getG() + " d^" + this.getD();
+        return " g^" + ((this.g == Constants.INFINITY) ? ("inf") : ((this.g == Constants._INFINITY) ? ("-inf") : ("" + this.g)))
+                + " d^" + ((this.d == Constants.INFINITY) ? ("inf") : ((this.d == Constants._INFINITY) ? ("-inf") : ("" + this.d)));
     }
 }
