@@ -11,11 +11,11 @@ public class Monomial implements Comparable<Monomial> {
     final private int d;
 
 
-    public int getG() {
+    public int getGamma() {
         return g;
     }
 
-    public int getD() {
+    public int getDelta() {
         return d;
     }
 
