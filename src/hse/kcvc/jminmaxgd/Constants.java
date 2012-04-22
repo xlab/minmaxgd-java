@@ -7,5 +7,6 @@ package hse.kcvc.jminmaxgd;
  * Contact: me@kc.vc
  */
 public class Constants {
-
+    public final static int Infinity = Integer.MAX_VALUE;
+    public final static int _Infinity = Integer.MIN_VALUE;
 }
