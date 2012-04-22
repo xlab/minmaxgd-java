@@ -1,5 +1,7 @@
 package hse.kcvc.jminmaxgd;
 
+import java.util.Arrays;
+
 /**
  * User: Kouprianov Maxim
  * Date: 10.04.12
@@ -7,4 +9,11 @@ package hse.kcvc.jminmaxgd;
  * Contact: me@kc.vc
  */
 public class Polynom {
+    private GD data;
+    private boolean simple;
+
+    public void sortGD(GD[] array) {
+        Arrays.sort(array);
+    }
+
 }
