@@ -32,7 +32,7 @@ public class Monomial implements Comparable<Monomial> {
      *
      * @param gd Target Monomial to copy from
      */
-    public Monomial(Monomial gd) {
+    public Monomial(final Monomial gd) {
         this.g = gd.g;
         this.d = gd.d;
     }
@@ -58,8 +58,8 @@ public class Monomial implements Comparable<Monomial> {
 
     }
 
-    public Monomial inf(Monomial gd2) {
-        int g, d;
+    public Monomial inf(final Monomial gd2) {
+        final int g, d;
         if (gd2.g > this.g)
             g = gd2.g;
         else
@@ -74,8 +74,8 @@ public class Monomial implements Comparable<Monomial> {
         return new Monomial(g, d);
     }
 
-    public Monomial otimes(Monomial gd2) {
-        int g, d;
+    public Monomial otimes(final Monomial gd2) {
+        final int g, d;
         if (this.g == Constants._INFINITY || gd2.g == Constants._INFINITY)
             g = Constants._INFINITY;
         else if (this.g == Constants.INFINITY || gd2.g == Constants.INFINITY)
@@ -92,8 +92,8 @@ public class Monomial implements Comparable<Monomial> {
         return new Monomial(g, d);
     }
 
-    public Monomial frac(Monomial gd2) {
-        int g, d;
+    public Monomial frac(final Monomial gd2) {
+        final int g, d;
         switch (this.g) {
             case Constants._INFINITY:
                 g = Constants._INFINITY;
