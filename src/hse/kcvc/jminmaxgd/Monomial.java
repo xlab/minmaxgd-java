@@ -6,7 +6,7 @@ package hse.kcvc.jminmaxgd;
  * Time: 13:57
  * Contact: me@kc.vc
  */
-public class GD implements Comparable<GD> {
+public class Monomial implements Comparable<Monomial> {
     final private int g;
     final private int d;
 
@@ -22,7 +22,7 @@ public class GD implements Comparable<GD> {
     /**
      * Constructor 0: (g,d) = (+∞,-∞)
      */
-    public GD() {
+    public Monomial() {
         this.g = Constants.INFINITY;
         this.d = Constants._INFINITY;
     }
@@ -30,9 +30,9 @@ public class GD implements Comparable<GD> {
     /**
      * Constructor 1: initialize by prototype
      *
-     * @param gd Target GD to copy from
+     * @param gd Target Monomial to copy from
      */
-    public GD(GD gd) {
+    public Monomial(Monomial gd) {
         this.g = gd.g;
         this.d = gd.d;
     }
@@ -43,12 +43,12 @@ public class GD implements Comparable<GD> {
      * @param g Gamma to set
      * @param d Delta to set
      */
-    public GD(final int g, final int d) {
+    public Monomial(final int g, final int d) {
         this.g = g;
         this.d = d;
     }
 
-    public int compareTo(GD gd2) {
+    public int compareTo(Monomial gd2) {
         if (this.g == gd2.g && this.d == gd2.d)
             return 0;
         else if (this.g < gd2.g && this.d > gd2.d)
@@ -58,7 +58,7 @@ public class GD implements Comparable<GD> {
 
     }
 
-    public GD inf(GD gd2) {
+    public Monomial inf(Monomial gd2) {
         int g, d;
         if (gd2.g > this.g)
             g = gd2.g;
@@ -71,10 +71,10 @@ public class GD implements Comparable<GD> {
             d = Constants._INFINITY;
 
 
-        return new GD(g, d);
+        return new Monomial(g, d);
     }
 
-    public GD otimes(GD gd2) {
+    public Monomial otimes(Monomial gd2) {
         int g, d;
         if (this.g == Constants._INFINITY || gd2.g == Constants._INFINITY)
             g = Constants._INFINITY;
@@ -89,10 +89,10 @@ public class GD implements Comparable<GD> {
             d = Constants.INFINITY;
         else d = this.d + gd2.d;
 
-        return new GD(g, d);
+        return new Monomial(g, d);
     }
 
-    public GD frac(GD gd2) {
+    public Monomial frac(Monomial gd2) {
         int g, d;
         switch (this.g) {
             case Constants._INFINITY:
@@ -136,7 +136,7 @@ public class GD implements Comparable<GD> {
                 }
         }
 
-        return new GD(g, d);
+        return new Monomial(g, d);
     }
 
     @Override

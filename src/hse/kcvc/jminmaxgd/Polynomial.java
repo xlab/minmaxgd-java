@@ -9,15 +9,15 @@ import java.util.Collections;
  * Time: 14:01
  * Contact: me@kc.vc
  */
-public class Polynom {
-    private ArrayList<GD> data;
+public class Polynomial {
+    private ArrayList<Monomial> data;
     private boolean simple;
 
     public void sort() {
         Collections.sort(data);
     }
 
-    public Polynom(final Polynom p2) {
+    public Polynomial(final Polynomial p2) {
         Collections.copy(this.data, p2.data);
         this.simple = p2.simple;
     }
@@ -46,8 +46,8 @@ public class Polynom {
             if (data.get(0).getG() == Constants._INFINITY)   // if poly begins with g = -∞
             {
                 if (data.get(0).getD() != Constants._INFINITY) {
-                    data = new ArrayList<GD>(Constants.POLY_SIZE);
-                    data.add(new GD());
+                    data = new ArrayList<Monomial>(Constants.POLY_SIZE);
+                    data.add(new Monomial());
                     return;
                 } else // -∞,-∞ <=> +∞,-∞
                 {
@@ -56,7 +56,7 @@ public class Polynom {
             }
 
             // Check if last element is epsilon && not alone, then pop him
-            if (data.get(data.size() - 1).compareTo(new GD()) == 0 && data.size() > 1)
+            if (data.get(data.size() - 1).compareTo(new Monomial()) == 0 && data.size() > 1)
                 data.remove(data.size() - 1);
 
             // Check if last element (+∞, x) <=> +∞,-∞
