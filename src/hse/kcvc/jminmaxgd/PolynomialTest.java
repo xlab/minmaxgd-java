@@ -16,7 +16,7 @@ public class PolynomialTest {
     public void testOtimes() throws Exception {
         ArrayList<Monomial> list1 = new ArrayList<Monomial>();
         ArrayList<Monomial> list2 = new ArrayList<Monomial>();
-        for (int i = 0; i < 100; ++i) {
+        for (int i = 0; i < 100000; ++i) {
             int a, b, c, d;
             a = new Random().nextInt(20);
             b = new Random().nextInt(20);

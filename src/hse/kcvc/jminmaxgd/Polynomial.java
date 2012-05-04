@@ -106,95 +106,11 @@ public class Polynomial {
     }
 
     public Polynomial otimes(Polynomial poly2) {
-        Polynomial temp;
-        Polynomial poly1;
-        int halfsize = 0;
-        ArrayList<ArrayList<Monomial>> halfbuffer;
-        ArrayList<ArrayList<Monomial>> results;
-        int[] polysizes;
-
-        if (!this.simple) {
-            temp = new Polynomial(this.data);
-            temp.simplify();
-            poly1 = temp;
-        } else {
-            poly1 = this;
-        }
-
-        if (!this.simple) {
-            temp = new Polynomial(poly2.data);
-            temp.simplify();
-            poly2 = temp;
-        }
-
-        //convert to small * big instead of big * small
-        if (poly1.data.size() > poly2.data.size()) {
-            temp = poly1;
-            poly1 = poly2;
-            poly2 = temp;
-        }
-
-        int polysize1 = poly1.data.size();
-        int polysize2 = poly2.data.size();
-
-        halfsize = (polysize1 + 1) / 2;
-        halfbuffer = new ArrayList<ArrayList<Monomial>>(halfsize);
-        results = new ArrayList<ArrayList<Monomial>>(polysize1);
-
-        for (int j = 0; j < polysize1; ++j) {
-            results.add(new ArrayList<Monomial>(polysize2));
-
-        }
-
-        for (int j = 0; j < halfsize; ++j) {
-            halfbuffer.add(new ArrayList<Monomial>(polysize2));
-        }
-
-        for (int j = 0; j < polysize1; j++)
-            for (int k = 0; k < polysize2; k++)
-                results.get(j).add(poly1.getElement(j).otimes(poly2.getElement(k)));
-
-        int nbpoly = polysize1;
-
-        while (nbpoly > 1) {
-            int i = 0;
-            int j = 0;
-            int k;
-
-            while (i < nbpoly) {
-                k = i + 1;
-                if (k < nbpoly) {
-                    halfbuffer.set(j, new ArrayList<Monomial>(results.get(i)));
-                    halfbuffer.get(j).addAll(results.get(k));
-                } else {
-                    halfbuffer.set(j, results.get(i));
-                }
-                i += 2;
-                ++j;
-            }
-
-            nbpoly = j;
-            halfsize = (nbpoly + 1) / 2;
-
-            for (j = 0; j < nbpoly; ++j) {
-                results.set(j, halfbuffer.get(j));
-            }
-
-
-            for (j = 0, k = 0; j < halfsize; ++j) {
-                halfbuffer.set(j, null);
-
-                if (k + 1 < nbpoly)
-                    halfbuffer.set(j, new ArrayList<Monomial>(results.get(k).size() + results.get(k + 1).size()));
-                else
-                    halfbuffer.set(j, new ArrayList<Monomial>(results.get(k).size()));
-
-                k += 2;
-            }
-
-        }
-
-        return new Polynomial(results.get(0));
+        ArrayList<Monomial> result = new ArrayList<Monomial>(this.data.size() * poly2.data.size());
+        for (Monomial m1 : this.data)
+            for (Monomial m2 : poly2.data)
+                result.add(m1.otimes(m2));
+        return new Polynomial(result);
     }
 
     public Polynomial otimes(Monomial gd) {
