@@ -34,7 +34,7 @@ public class Polynomial {
     public Polynomial(final ArrayList<Monomial> list) {
         this();
 
-        if (list.size() > 1) {
+        if (list.size() >= 1) {
             this.data = new ArrayList<Monomial>(list);
             simple = false;
             sortSimplify();
