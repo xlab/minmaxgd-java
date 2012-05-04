@@ -51,10 +51,12 @@ public class Monomial implements Comparable<Monomial> {
     public int compareTo(Monomial gd2) {
         if (this.g == gd2.g && this.d == gd2.d)
             return 0;
-        else if (this.g < gd2.g && this.d > gd2.d)
-            return 1;
-        else
-            return -1;
+
+        if (g < gd2.g) return 1;
+        if (g == gd2.g)
+            if (d > gd2.d) return 1;
+
+        return -1;
 
     }
 

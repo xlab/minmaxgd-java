@@ -20,6 +20,7 @@ public class Polynomial {
 
     public void sort() {
         Collections.sort(data);
+        Collections.reverse(data);
     }
 
     public int getCount() {
@@ -31,8 +32,19 @@ public class Polynomial {
     }
 
     public Polynomial(final ArrayList<Monomial> list) {
-        this.data = new ArrayList<Monomial>(list);
-        sortSimplify();
+        this();
+
+        if (list.size() > 1) {
+            this.data = new ArrayList<Monomial>(list);
+            simple = false;
+            sortSimplify();
+        }
+    }
+
+    public Polynomial() {
+        this.data = new ArrayList<Monomial>(Constants.POLY_SIZE);
+        this.data.add(new Monomial());
+        this.simple = true;
     }
 
     public Polynomial(final Monomial gd) {
@@ -51,12 +63,16 @@ public class Polynomial {
 
     public void simplify() {
         if (data != null) {
-            for (int j = 1, i = 0; j < data.size(); ++j) {
-                if (data.get(j).getDelta() > data.get(j).getDelta()) {
+            int i = 0;
+            for (int j = 1; j < data.size(); ++j) {
+                if (data.get(j).getDelta() > data.get(i).getDelta()) {
                     ++i;
                     data.set(i, data.get(j));
                 }
             }
+
+            //first item is on top, by sort
+            data = new ArrayList<Monomial>(data.subList(0, i + 1));
 
             if (data.get(0).getGamma() == Constants._INFINITY)   // if poly begins with g = -∞
             {
