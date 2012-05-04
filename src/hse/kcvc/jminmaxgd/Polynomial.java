@@ -73,31 +73,6 @@ public class Polynomial {
 
             //first item is on top, by sort
             data = new ArrayList<Monomial>(data.subList(0, i + 1));
-
-            if (data.get(0).getGamma() == Constants._INFINITY)   // if poly begins with g = -∞
-            {
-                if (data.get(0).getDelta() != Constants._INFINITY) {
-                    data = new ArrayList<Monomial>(Constants.POLY_SIZE);
-                    data.add(new Monomial());
-                    return;
-                } else // -∞,-∞ <=> +∞,-∞
-                {
-                    while (data.get(0).getGamma() == Constants._INFINITY) data.remove(0);
-                }
-            }
-
-            // Check if last element is epsilon && not alone, then pop him
-            if (data.get(data.size() - 1).compareTo(new Monomial()) == 0 && data.size() > 1)
-                data.remove(data.size() - 1);
-
-            // Check if last element (+∞, x) <=> +∞,-∞
-            if (data.get(data.size() - 1).getGamma() == Constants.INFINITY &&
-                    data.get(data.size() - 1).getDelta() != Constants._INFINITY) data.remove(data.size() - 1);
-
-            // Check if first element (x, -∞) <=> +∞,-∞
-            if (data.get(0).getGamma() != Constants.INFINITY &&
-                    data.get(0).getDelta() == Constants._INFINITY) data.remove(0);
-
             this.simple = true;
         }
     }
