@@ -94,6 +94,34 @@ public class Monomial implements Comparable<Monomial> {
         return new Monomial(g, d);
     }
 
+    public Series star() {
+        serie result;
+
+        result.p.init(infinity, _infinity);
+        result.q.init(0, 0);
+        result.canonise = 1;
+        // Cas d����
+        if (r1.getg() == infinity || r1.getd() == 0) {
+            result.r.init(0, 0);
+            return (result);
+        }
+        if (r1.getg() == 0 && r1.getd() > 0) {
+            result.r.init(0, infinity);
+            return (result);
+        }
+
+        if (r1.getd() == infinity) {
+            result.p.init(0, 0);
+            result.q.init(r1.getg(), infinity);
+            result.r.init(r1.getg(), infinity);
+            return (result);
+        }
+        // Cas classique
+
+        result.r.init(r1.getg(), r1.getd());
+        return (result);
+    }
+
     public Monomial frac(final Monomial gd2) {
         final int g, d;
         switch (this.g) {
