@@ -1,6 +1,7 @@
 package hse.kcvc.jminmaxgd;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * User: Kouprianov Maxim
@@ -160,32 +161,35 @@ public class Series {
 
 
         if ((nb_g >= r.getGamma()) || ((q.getElement(j).getDelta() - q.getElement(0).getDelta()) >= r.getDelta())) {
-            ArrayList<Monomial> periodique = new ArrayList<Monomial>(q.getCount());
-            periodique.set(0, q.getElement(j));
+            Monomial[] periodique = new Monomial[q.getCount()];
+            periodique[0] = q.getElement(j);
 
             int nb_max = 1 + (q.getElement(j).getGamma() - q.getElement(0).getGamma()) / r.getGamma();
-            ArrayList<Monomial> transitoire = new ArrayList<Monomial>(nb_max * q.getCount());
+            Monomial[] transitoire = new Monomial[nb_max * q.getCount()];
 
             k = 0;
             for (i = 0; i < j; ++i) {
-                transitoire.set(k, q.getElement(i));
+                transitoire[k] = q.getElement(i);
                 int nbcoups = (q.getElement(j).getGamma() - q.getElement(i).getGamma() - 1) / r.getGamma();
 
                 for (int n = 1; n <= nbcoups; n++) {
-                    transitoire.set(k + n, r.otimes(transitoire.get(k + n - 1)));
+                    transitoire[k + n] = r.otimes(transitoire[k + n - 1]);
                 }
                 k = k + nbcoups;
 
-                periodique.set(i + 1, r.otimes(transitoire.get(k)));
+                periodique[i + 1] = r.otimes(transitoire[k]);
                 k++;
             }
 
             for (i = 0; i < k; ++i) {
-                p.addElement(transitoire.get(i));
+                p.addElement(transitoire[i]);
             }
 
             p.sortSimplify();
-            this.q = new Polynomial((ArrayList<Monomial>) (periodique.subList(0, q.getCount() - 1)));
+
+            ArrayList<Monomial> tmpList = new ArrayList<Monomial>(periodique.length);
+            tmpList.addAll(Arrays.asList(periodique));
+            this.q = new Polynomial(tmpList);
         }
 
         int index;

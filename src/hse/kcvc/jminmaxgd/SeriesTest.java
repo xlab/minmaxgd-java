@@ -23,14 +23,10 @@ public class SeriesTest {
         q.add(new Monomial(4, 5));
         q.add(new Monomial(7, 9));
 
-        Series s1 = new Series(new Polynomial(p), new Polynomial(q), new Monomial(1, 6));
-        Series s2 = new Series(new Polynomial(q), new Polynomial(p), new Monomial(3, 2));
-        s1.canonize();
-        s1 = s1.star();
-
+        Monomial r2 = new Monomial(3, 2);
+        Series s2 = new Series(new Polynomial(q), new Polynomial(p), r2);
         s2.canonize();
         s2 = s2.star();
-        System.out.println(s1);
         System.out.println(s2);
         //System.out.println(s1);
         // System.out.println(p);
