@@ -3,6 +3,7 @@ package hse.kcvc.jminmaxgd;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * User: Kouprianov Maxim
@@ -14,24 +15,43 @@ public class SeriesTest {
     @Test
     public void test() throws Exception {
 
-        ArrayList<Monomial> p = new ArrayList<Monomial>();
-        p.add(new Monomial(1, 2));
-        p.add(new Monomial(3, 4));
-        p.add(new Monomial(5, 6));
+        Polynomial p1 = new Polynomial(new ArrayList<Monomial>(Arrays.asList(
+                new Monomial[]{
+                        new Monomial(1, 1),
+                        new Monomial(2, 3),
+                        new Monomial(4, 5),
+                }
+        )));
 
-        ArrayList<Monomial> q = new ArrayList<Monomial>();
-        q.add(new Monomial(4, 5));
-        q.add(new Monomial(7, 9));
+        Polynomial p2 = new Polynomial(new ArrayList<Monomial>(Arrays.asList(
+                new Monomial[]{
+                        new Monomial(1, 3),
+                        new Monomial(3, 3),
+                        new Monomial(8, 4),
+                }
+        )));
 
-        Monomial r2 = new Monomial(3, 2);
-        Series s2 = new Series(new Polynomial(q), new Polynomial(p), r2);
-        s2.canonize();
-        s2 = s2.star();
-        System.out.println(s2);
-        //System.out.println(s1);
-        // System.out.println(p);
-        // System.out.println(q);
-        //System.out.println(r);
-        //System.out.println(new Polynomial(new Monomial(1,1)).equals(new Polynomial(new Monomial(1,1))));
+        Polynomial q1 = new Polynomial(new ArrayList<Monomial>(Arrays.asList(
+                new Monomial[]{
+                        new Monomial(10, 11),
+                        new Monomial(12, 15),
+                }
+        )));
+
+        Polynomial q2 = new Polynomial(new ArrayList<Monomial>(Arrays.asList(
+                new Monomial[]{
+                        new Monomial(10, 5),
+                        new Monomial(12, 7),
+                        new Monomial(13, 9),
+                }
+        )));
+
+        Monomial r1 = new Monomial(2, 3);
+        Monomial r2 = new Monomial(4, 4);
+
+        Series s1 = new Series(p1, q1, r1);
+        Series s2 = new Series(p2, q2, r2);
+
+        System.out.println(s2.otimes(s1));
     }
 }
