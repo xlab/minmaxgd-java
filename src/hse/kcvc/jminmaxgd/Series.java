@@ -36,6 +36,10 @@ public class Series {
         this.canonical = false;
     }
 
+    public Series(Polynomial p, Polynomial q, Monomial r) {
+        this(p, q, r, false);
+    }
+
     public Series(Polynomial p, Polynomial q, Monomial r, boolean canonical) {
         if (r.getDelta() < 0 || r.getGamma() < 0) {
             throw (new ArithmeticException("r must have positive shifts"));
@@ -56,6 +60,13 @@ public class Series {
         this.canonical = true;
     }
 
+    public Series(Series s2) {
+        this.p = new Polynomial(s2.p);
+        this.q = new Polynomial(s2.q);
+        this.r = new Monomial(s2.r);
+        this.canonical = s2.canonical;
+    }
+
     public Series(Monomial gd) {
         this.p = new Polynomial();
         this.q = new Polynomial(gd);
@@ -64,10 +75,6 @@ public class Series {
     }
 
     public void canonize() {
-
-
-        //long nb_g, index, nu, tau;
-
         Monomial epsilon = new Monomial();
         Monomial Top = new Monomial(Constants._INFINITY, Constants.INFINITY);
         if (this.canonical) return;
@@ -139,7 +146,7 @@ public class Series {
             i = 0;
             while (i < j) {
                 k = (q.getElement(j).getGamma() - q.getElement(i).getGamma()) / r.getGamma();
-                if ((k >= 1) && ((q.getElement(i).getDelta() + (int) k * r.getDelta()) >= q.getElement(j).getDelta())) {
+                if ((k >= 1) && ((q.getElement(i).getDelta() + k * r.getDelta()) >= q.getElement(j).getDelta())) {
                     q.popSome(j);
                     j--;
                     i = 0;
@@ -209,12 +216,11 @@ public class Series {
                 }
 
                 boolean equal = false;
-                if (extended.getCount() == q.getCount()) // si ils ont la meme taille
-                {
-                    i = assembled.getCount();    // les n premiers points sont forcement egaux pas necessaire de les tester
+                if (extended.getCount() == q.getCount()) {
+                    i = assembled.getCount();
                     equal = true;
                     while (equal && i < q.getCount()) {
-                        if (extended.getElement(i) != q.getElement(i)) {
+                        if (!extended.getElement(i).equals(q.getElement(i))) {
                             equal = false;
                         }
                         i++;
@@ -244,7 +250,7 @@ public class Series {
             dominant = false;
             j = 0;
             do {
-                if (p.getElement(i).compareTo(q.getElement(j)) == -1 && p.getElement(i) != epsilon) {
+                if (p.getElement(i).compareTo(q.getElement(j)) <= 0 && !p.getElement(i).equals(epsilon)) {
                     p.pop();
                     i = p.getCount() - 1;
                     dominant = true;
@@ -254,10 +260,10 @@ public class Series {
         } while (dominant);
 
         i = p.getCount() - 1;
-        if (p.getElement(i) != epsilon) {
+        if (!p.getElement(i).equals(epsilon)) {
             Polynomial temp = new Polynomial(epsilon);
-            while ((p.getElement(i).getGamma() >= q.getElement(0).getGamma()) ||
-                    (p.getElement(i).getDelta() >= q.getElement(0).getDelta())) {
+            while (((p.getElement(i).getGamma() >= q.getElement(0).getGamma()) ||
+                    (p.getElement(i).getDelta() >= q.getElement(0).getDelta())) && !q.equals(new Polynomial(epsilon))) {
                 for (j = 0; j < q.getCount(); j++) {
                     temp.addElement(q.getElement(j));
                 }
@@ -266,34 +272,39 @@ public class Series {
             p = p.oplus(temp);
         }
 
-        while (q.getElement(q.getCount() - 1) == r.otimes(p.getElement(p.getCount() - 1))) {
+        while (q.getElement(q.getCount() - 1).equals(r.otimes(p.getElement(p.getCount() - 1))) && !r.otimes(p.getElement(p.getCount() - 1)).equals(epsilon)) {
             for (i = (q.getCount() - 1); i > 0; i--)
                 q.setElement(i, q.getElement(i - 1));
             q.setElement(0, p.getElement(p.getCount() - 1));
             p.pop();
         }
+
         this.canonical = true;
     }
 
     public Series oplus(Series s2) {
         int j;
         Series result;
-        Series tampon;
-        Monomial gd;
         double slope1, slope2;
 
         int i;
-        long k1, k2, k, t2;
+        int k1, k2, k, t2;
         Polynomial p, q;
-        Monomial r, epsilon;
+        Monomial r;
         Series ads1 = this;
         Series ads2 = s2;
 
+        Monomial epsilon = new Monomial(0, 0);
         Monomial Top = new Monomial(Constants._INFINITY, Constants.INFINITY);
+        result = new Series();
 
+        if (!this.canonical) {
+            this.canonize();
+        }
 
-        if (!this.canonical) this.canonize();
-        if (!s2.canonical) s2.canonize();
+        if (!s2.canonical) {
+            s2.canonize();
+        }
 
         if (this.q.getElement(0).getGamma() == Constants._INFINITY || s2.q.getElement(0).getGamma() == Constants._INFINITY) {
             result.p = new Polynomial(epsilon);
@@ -390,24 +401,22 @@ public class Series {
             k1 = r.getGamma() / this.r.getGamma();
             k2 = r.getGamma() / s2.r.getGamma();
 
-            q = this.q;
-
             for (i = 1; i <= k1 - 1; i++)
                 for (j = 0; j < this.q.getCount(); j++) {
                     Monomial monome = new Monomial(i * this.r.getGamma(), i * this.r.getDelta());
                     monome = monome.otimes(this.q.getElement(j));
-                    q.addElement(monome);
+                    this.q.addElement(monome);
                 }
 
-
+            int count = s2.q.getCount();
             for (i = 0; i <= k2 - 1; i++)
-                for (j = 0; j < s2.q.getCount(); j++) {
+                for (j = 0; j < count; j++) {
                     Monomial monome = new Monomial(s2.q.getElement(j).getGamma() + i * s2.r.getGamma(), s2.q.getElement(j).getDelta() + i * s2.r.getDelta());
-                    q.addElement(monome);
+                    this.q.addElement(monome);
                 }
 
             result.p = p;
-            result.q = q;
+            result.q = this.q;
             result.r = r;
             result.canonical = false;
             result.canonize();
@@ -430,7 +439,7 @@ public class Series {
 
             for (i = 0; i < k; i++) {
                 for (j = 0; j < ads2.q.getCount(); j++) {
-                    p.addElement(new Monomial(ads2.q.getElement(j).getGamma() + i * ads2.r.getGamma(), ads2.q.getElement(j).getDelta() + i * ads2.r.getDelta());
+                    p.addElement(new Monomial(ads2.q.getElement(j).getGamma() + i * ads2.r.getGamma(), ads2.q.getElement(j).getDelta() + i * ads2.r.getDelta()));
                 }
             }
 
@@ -447,195 +456,262 @@ public class Series {
         return (result);
     }
 
+    public Series otimes(Monomial gd2) {
+        Series s2 = new Series();
+        s2.p = new Polynomial(new Monomial());
+        s2.q = new Polynomial(new Monomial(gd2.getGamma(), gd2.getDelta()));
+        s2.r = new Monomial(0, 0);
+        s2.canonical = true;
+        return (this.otimes(s2));
+    }
+
+    public Series otimes(Polynomial p2) {
+        Series s2 = new Series();
+        s2.p = p2;
+        s2.q = new Polynomial(s2.p.getElement(s2.p.getCount() - 1));
+        s2.p.pop();
+        s2.r = new Monomial(0, 0);
+        s2.canonical = true;
+        return (this.otimes(s2));
+    }
+
+    public Series oplus(Monomial gd2) {
+        Series s2 = new Series();
+        s2.p = new Polynomial(new Monomial());
+        s2.q = new Polynomial(new Monomial(gd2.getGamma(), gd2.getDelta()));
+        s2.r = new Monomial(0, 0);
+        s2.canonical = true;
+        return (this.oplus(s2));
+    }
+
+    public Series oplus(Polynomial p2) {
+        Series s2 = new Series();
+        s2.p = p2;
+        s2.q = new Polynomial(s2.p.getElement(s2.p.getCount() - 1));
+        s2.p.pop();
+        s2.r = new Monomial(0, 0);
+        s2.canonical = true;
+        return (this.oplus(s2));
+    }
+
     public Series otimes(Series s2) {
-        serie * ads1 =&s1;
-        serie * ads2 =&s2;
+        Series ads1 = this;
+        Series ads2 = s2;
 
-        gd monome;
-        poly p1, q1;
+        Polynomial p1, q1;
         int i, j;
-        long int a;
-        long k1, k2, teta;
-        double pente1, pente2, test1, test2;
+        int a;
+        int k1, k2, teta;
+        double slope1, slope2, test1, test2;
         double tau;
-        serie temp1, result, tampon;
-        gd epsilon;
+        Series temp1, result;
 
-        gd Top (_infinity, infinity);
+        temp1 = new Series();
+        result = new Series();
+
+        Monomial epsilon = new Monomial();
+        Monomial Top = new Monomial(Constants._INFINITY, Constants.INFINITY);
 
 
-        if (s1.canonise == 0) s1.canon();
-        if (s2.canonise == 0) s2.canon();
+        if (!this.canonical) this.canonize();
+        if (!s2.canonical) s2.canonize();
 
-        //** si l'une des s�ies vaut epsilon
-
-        if (s1.q.getpol(0).getg() == infinity || s2.q.getpol(0).getg() == infinity) {
-            result.p = epsilon;
-            result.q = epsilon;
-            result.r.init(0, 0);
-            result.canonise = 1;
+        if (this.q.getElement(0).getGamma() == Constants.INFINITY || s2.q.getElement(0).getGamma() == Constants.INFINITY) {
+            result.p = new Polynomial(epsilon);
+            result.q = new Polynomial(epsilon);
+            result.r = new Monomial(0, 0);
+            result.canonical = true;
             return (result);
         }
 
-
-        //** si l'une des s�ies vaut Top
-
-        if (s1.q.getpol(0).getg() == _infinity || s2.q.getpol(0).getg() == _infinity) {
-            result.p = epsilon;
-            result.q = Top;
-            result.r.init(0, 0);
-            result.canonise = 1;
+        if (this.q.getElement(0).getGamma() == Constants._INFINITY || s2.q.getElement(0).getGamma() == Constants._INFINITY) {
+            result.p = new Polynomial(epsilon);
+            result.q = new Polynomial(Top);
+            result.r = new Monomial(0, 0);
+            result.canonical = true;
             return (result);
         }
 
+        result.canonical = false;
+        result.p = this.p.otimes(s2.p);
 
-        //(p1 + q1r1*)(p2 + q2r2*)=p1p2 +p1 q2 r2* + p2 q1 r1* + q1 q2 r1* r2 *
-        result.canonise = 0;
-        result.p = otimes(s1.p, s2.p); // p1 p2
 
-        result.q = otimes(s1.p, s2.q); // p1 q2
-        result.r = s2.r;                // r2
-        result.canon();
+        result.q = this.p.otimes(s2.q);
+        result.r = s2.r;
+        result.canonize();
 
-        temp1.q = otimes(s2.p, s1.q);    // p2 q1
-        temp1.p.init(infinity, _infinity);
-        temp1.r = s1.r;                // r1
-        temp1.canon();
+        //System.out.println(result.r);
 
-        result = oplus(result, temp1); // p1p2 +p1 q2 r2* + p2 q1 r1*
+        temp1.q = s2.p.otimes(this.q);
+        temp1.p = new Polynomial(new Monomial(Constants.INFINITY, Constants._INFINITY));
+        temp1.r = this.r;
+        temp1.canonize();
 
-        //*****		Traitement de q1 q2 r1* r2 *				*****//
-        temp1.canonise = 0;
-        temp1.q = otimes(s1.q, s2.q);        // q1 q2
+        result = result.oplus(temp1);
 
-        /**** Les cas d����	 *******/
-        if (s1.r.getd() == 0 && s2.r.getd() == 0) {
-            result = oplus(result, temp1);
+        temp1.canonical = false;
+        temp1.q = this.q.otimes(s2.q);
+
+
+        if (this.r.getDelta() == 0 && s2.r.getDelta() == 0) {
+            result = result.oplus(temp1);
             return (result);
         }
 
-        if ((s1.r.getg() == 0 && s1.r.getd() == infinity) || (s2.r.getg() == 0 && s2.r.getd() == infinity)) {   //monome.init(0,infinity);
-            //temp1.q.add(monome);
-            //	temp1.q.simpli();
-            temp1.p.init(infinity, _infinity);
-            temp1.r.init(0, infinity);
-            result = oplus(result, temp1);
+        if ((this.r.getGamma() == 0 && this.r.getDelta() == Constants.INFINITY) ||
+                (s2.r.getGamma() == 0 && s2.r.getDelta() == Constants.INFINITY)) {
+
+            temp1.p = new Polynomial(new Monomial(Constants.INFINITY, Constants._INFINITY));
+            temp1.r = new Monomial(0, Constants.INFINITY);
+            result = result.oplus(temp1);
             return (result);
         }
 
-        if (s1.r.getd() == 0 && s1.r.getg() == 0 && s2.r.getg() != 0 && s2.r.getd() != 0 && s2.r.getd() != infinity) {// inversion pour traitement symetrique apr�
-            ads1 =&s2;
-            ads2 =&s1;
+        if (this.r.getDelta() == 0 && this.r.getGamma() == 0 &&
+                s2.r.getGamma() != 0 && s2.r.getDelta() != 0 &&
+                s2.r.getDelta() != Constants.INFINITY) {
+            ads1 = s2;
+            ads2 = this;
         }
 
+        if (ads2.r.getDelta() == 0 && ads2.r.getGamma() == 0 && ads1.r.getGamma() != 0 && ads1.
+                r.getDelta() != 0 && ads1.r.getDelta() != Constants.INFINITY) {
 
-        if (( * ads2).r.getd() == 0 && ( * ads2).r.getg() == 0 && ( * ads1).r.getg() != 0 && ( * ads1).
-        r.getd() != 0 && ( * ads1).r.getd() != infinity)
-        {
-            temp1.r = ( * ads1).r;
-            temp1.p.init(infinity, _infinity);
-            temp1.canon();
-            result = oplus(result, temp1);
+            temp1.r = ads1.r;
+            temp1.p = new Polynomial(new Monomial(Constants.INFINITY, Constants._INFINITY));
+            temp1.canonize();
+            result = result.oplus(temp1);
 
             return (result);
         }
 
-        /**** le cas non d���� ****/
-        pente1 = (double) s1.r.getg() / s1.r.getd();
-        pente2 = (double) s2.r.getg() / s2.r.getd();
+        slope1 = (double) this.r.getGamma() / this.r.getDelta();
+        slope2 = (double) s2.r.getGamma() / s2.r.getDelta();
 
-        if (pente1 == pente2) {
-            k1 = gcd(s1.r.getg(), s2.r.getg());
-            k2 = gcd(s1.r.getd(), s2.r.getd());
+        if (slope1 == slope2) {
+            k1 = Tools.gcd(this.r.getGamma(), s2.r.getGamma());
+            k2 = Tools.gcd(this.r.getDelta(), s2.r.getDelta());
 
-            temp1.r.init(k1, k2); // la pente de r1* . r2*
+            temp1.r = new Monomial(k1, k2);
             tau = (double) k1 / k2;
 
-            k1 = (long) ((double) (s1.r.getg() - k1) * (s2.r.getg() - k1)) / k1;
+            k1 = (int) ((double) (this.r.getGamma() - k1) * (s2.r.getGamma() - k1)) / k1;
+            k2 = (int) ((double) (this.r.getDelta() - k2) * (s2.r.getDelta() - k2)) / k2;
+            p1 = new Polynomial(new Monomial(0, 0));
 
-            k2 = (long) ((double) (s1.r.getd() - k2) * (s2.r.getd() - k2)) / k2;
-
-            p1.init(0, 0);
             i = 0;
             j = 1;
-            teta = s2.r.getd();
+            teta = s2.r.getDelta();
             while (teta < k2) {
                 while (teta < k2) {
-                    monome.init((long) (tau * teta), teta);
-                    p1.add(monome);
+                    p1.addElement(new Monomial((int) (tau * teta), teta));
                     j++;
-                    teta = i * s1.r.getd() + j * s2.r.getd();
+                    teta = i * this.r.getDelta() + j * s2.r.getDelta();
                 }
                 i++;
                 j = 0;
-                teta = i * s1.r.getd() + j * s2.r.getd();
+                teta = i * this.r.getDelta() + j * s2.r.getDelta();
             }
 
-            p1.simpli();    // le transitoire de r1* . r*
-            temp1.p = otimes(p1, temp1.q); // q1*q2 * transitoire de r1*.r2*
-            monome.init(k1, k2);
-            temp1.q = otimes(temp1.q, monome); // q1*q2* motif de r1*.r2
-            temp1.canon();
+            p1.sortSimplify();
+            temp1.p = p1.otimes(temp1.q);
+            temp1.q = temp1.q.otimes(new Monomial(k1, k2));
+            temp1.canonize();
 
         } else {
-            if (pente1 > pente2) {
-                ads1 =&s2;
-                ads2 =&s1;
+            if (slope1 > slope2) {
+                ads1 = s2;
+                ads2 = this;
 
             }
 
-            k1 = ( * ads1).r.getg() * ( * ads1).r.getd();
-            k2 = ( * ads1).r.getd() * ( * ads2).r.getg() - ( * ads1).r.getg() * ( * ads2).r.getd();
-            k1 = MAX((long) ceil((double) k1 / k2), 0);
+            k1 = ads1.r.getGamma() * ads1.r.getDelta();
+            k2 = ads1.r.getDelta() * ads2.r.getGamma() - ads1.r.getGamma() * ads2.r.getDelta();
+            k1 = Math.max((int) Math.ceil((double) k1 / k2), 0);
 
 
-            a = (long) floor(((double) k1 * ( * ads2).r.getg()) / ( * ads1).r.getg());
-            test1 = (( * ads1).r.getd() * a);
-            test2 = (( * ads2).r.getd() * k1);
+            a = (int) Math.floor(((double) k1 * ads2.r.getGamma()) / ads1.r.getGamma());
+            test1 = (ads1.r.getDelta() * a);
+            test2 = (ads2.r.getDelta() * k1);
             while (test1 >= test2 && k1 > 0) {
                 k1--;
-                a = (long) floor(((double) k1 * ( * ads2).r.getg()) / ( * ads1).r.getg());
-                test1 = (( * ads1).r.getd() * a);
-                test2 = (( * ads2).r.getd() * k1);
+                a = (int) Math.floor(((double) k1 * ads2.r.getGamma()) / ads1.r.getGamma());
+                test1 = (ads1.r.getDelta() * a);
+                test2 = (ads2.r.getDelta() * k1);
             }
 
             k1++;
 
 
-            q1.init(0, 0);
+            q1 = new Polynomial(new Monomial(0, 0));
             for (j = 1; j < k1; j++) {
-                monome.init(( * ads2).r.getg() * j, ( * ads2).r.getd() * j);
-                q1.add(monome);
+                q1.addElement(new Monomial(ads2.r.getGamma() * j, ads2.r.getDelta() * j));
             }
-            temp1.q = otimes(temp1.q, q1);
-            temp1.p.init(infinity, _infinity);
-            temp1.r = ( * ads1).r;
-            temp1.canon();
+            temp1.q = temp1.q.otimes(q1);
+            temp1.p = new Polynomial(new Monomial(Constants.INFINITY, Constants._INFINITY));
+            temp1.r = ads1.r;
+            temp1.canonize();
         }
 
-
-        result = oplus(result, temp1);
-
+        result = result.oplus(temp1);
         return (result);
-
     }
 
     public Series star() {
-        serie result, temp;
-        gd monome;
+        Series operation, result, temp;
+        Monomial monome;
+        result = new Series();
 
-        if (s1.canonise == 0) s1.canon();
+        if (!this.canonical) this.canonize();
 
-        monome.init(0, 0);
+        operation = new Series(this);
+        monome = new Monomial(0, 0);
 
-        result.q = oplus(s1.q, s1.r);        //(q+r)
-        result = star(result.q);    // (q+r)*
+        result.q = operation.q.oplus(operation.r);
+        result = result.q.star();
 
-        result = oplus(monome, temp = otimes(s1.q, result)); // e + q .(q+r)*
+        result = result.otimes(operation.q);
+        result = result.oplus(monome);
 
-        temp = star(s1.p); // p*
+        temp = operation.p.star();
 
-        result = otimes(temp, result);
+        result = result.otimes(temp);
         return (result);
+    }
+
+    @Override
+    public String toString() {
+        Monomial epsilon = new Monomial(0, 0);
+        String flot = "";
+        /* if (!(this.p.equals(new Polynomial(epsilon)))) flot += this.p + "+";
+        if (!(this.q.equals(new Polynomial(epsilon)))) flot += "(" + this.q + ")[" + this.r + "]*";
+        else flot += "eps";   */
+        flot += this.p + "+";
+        flot += "(" + this.q + ")[" + this.r + "]*";
+        return flot;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Series)) return false;
+
+        Series series = (Series) o;
+
+        if (canonical != series.canonical) return false;
+        if (p != null ? !p.equals(series.p) : series.p != null) return false;
+        if (q != null ? !q.equals(series.q) : series.q != null) return false;
+        if (r != null ? !r.equals(series.r) : series.r != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = p != null ? p.hashCode() : 0;
+        result = 31 * result + (q != null ? q.hashCode() : 0);
+        result = 31 * result + (r != null ? r.hashCode() : 0);
+        result = 31 * result + (canonical ? 1 : 0);
+        return result;
     }
 }

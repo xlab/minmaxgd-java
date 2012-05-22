@@ -95,30 +95,29 @@ public class Monomial implements Comparable<Monomial> {
     }
 
     public Series star() {
-        serie result;
+        Series result = new Series();
 
-        result.p.init(infinity, _infinity);
-        result.q.init(0, 0);
-        result.canonise = 1;
-        // Cas d����
-        if (r1.getg() == infinity || r1.getd() == 0) {
-            result.r.init(0, 0);
+        result.p = new Polynomial(new Monomial(Constants.INFINITY, Constants._INFINITY));
+        result.q = new Polynomial(new Monomial(0, 0));
+        result.canonical = true;
+
+        if (this.getGamma() == Constants.INFINITY || this.getDelta() == 0) {
+            result.r = new Monomial(0, 0);
             return (result);
         }
-        if (r1.getg() == 0 && r1.getd() > 0) {
-            result.r.init(0, infinity);
+        if (this.getGamma() == 0 && this.getDelta() > 0) {
+            result.r = new Monomial(0, Constants.INFINITY);
             return (result);
         }
 
-        if (r1.getd() == infinity) {
-            result.p.init(0, 0);
-            result.q.init(r1.getg(), infinity);
-            result.r.init(r1.getg(), infinity);
+        if (this.getDelta() == Constants.INFINITY) {
+            result.p = new Polynomial(new Monomial(0, 0));
+            result.q = new Polynomial(new Monomial(this.getGamma(), Constants.INFINITY));
+            result.r = new Monomial(this.getGamma(), Constants.INFINITY);
             return (result);
         }
-        // Cas classique
 
-        result.r.init(r1.getg(), r1.getd());
+        result.r = new Monomial(this.getGamma(), this.getDelta());
         return (result);
     }
 
@@ -173,5 +172,25 @@ public class Monomial implements Comparable<Monomial> {
     public String toString() {
         return " g^" + ((this.g == Constants.INFINITY) ? ("inf") : ((this.g == Constants._INFINITY) ? ("-inf") : ("" + this.g)))
                 + " d^" + ((this.d == Constants.INFINITY) ? ("inf") : ((this.d == Constants._INFINITY) ? ("-inf") : ("" + this.d)));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Monomial)) return false;
+
+        Monomial monomial = (Monomial) o;
+
+        if (d != monomial.d) return false;
+        if (g != monomial.g) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = g;
+        result = 31 * result + d;
+        return result;
     }
 }

@@ -28,6 +28,9 @@ public class Polynomial {
     }
 
     public Monomial getElement(int n) {
+        if (n < 0 || n >= data.size()) {
+            return new Monomial();
+        }
         return data.get(n);
     }
 
@@ -43,6 +46,13 @@ public class Polynomial {
             simple = false;
             sortSimplify();
         }
+    }
+
+    public Polynomial(Polynomial p2) {
+        this();
+
+        this.data = (ArrayList<Monomial>) p2.data.clone();
+        this.simple = p2.simple;
     }
 
     public Polynomial() {
@@ -124,103 +134,90 @@ public class Polynomial {
     }
 
     public Series star() {
-        unsigned int i;
-        int j, nj, k, nb_pente_inferieure, n;
-        long numax = infinity, k1;
-        long gammakmax, gammakmin;
-        long ki, kmin, a;
-        int*tabki = NULL;
-        gd * tabgd = NULL;
 
+        int i, k1;
+        int j, nj, k, nb_lower_slope, n;
+        int numax = Constants.INFINITY;
+        int gammakmax, gammakmin;
+        int ki, kmin, a;
+        int[] tabki;
+        Monomial[] tabgd;
+        Monomial rtemp;
         double pente, pente1, test1, test2;
 
-
-        gd monome, rtemp;
-        poly temp;    // tableau temporaire
-        serie result;
-        poly qtemp;
-        gd epsilon;
+        Series result = new Series();
+        Polynomial qtemp;
+        Monomial epsilon = new Monomial();
 
 
-        poly1.simpli();
-        // Les cas d����
-        //si un ��ent  vaut Top
-        if (poly1.getpol(0).getg() == _infinity) {
-            result.p.init(infinity, _infinity);
-            result.q.init(_infinity, infinity);
-            result.r.init(0, 0);
-            result.canonise = 1;
+        this.sortSimplify();
+
+        if (this.getElement(0).getGamma() == Constants._INFINITY) {
+            result.p = new Polynomial(new Monomial(Constants.INFINITY, Constants._INFINITY));
+            result.q = new Polynomial(new Monomial(Constants._INFINITY, Constants.INFINITY));
+            result.r = new Monomial(0, 0);
+            result.canonical = true;
             return (result);
         }
 
 
-        for (i = 0; i < poly1.getn(); i++) // on ote les elements dont l'�oile vaut e
-        {
-            if (poly1.getpol(i).getg() == infinity || poly1.getpol(i).getd() == 0) {
-                if (poly1.getn() > 1) poly1.popj(i);
-                else // le resultat est la serie est : epsilon+ e .(e)*
-                {        // car il n'y qu'un �ement qui est nul dasn le polyn�e
-                    result.r.init(0, 0);
-                    result.p.init(infinity, _infinity);
-                    result.q.init(0, 0);
-                    result.canonise = 1;
-                    return (result);  // on retourne (epsilon+ e .(e)*
+        for (i = 0; i < this.getCount(); i++) {
+            if (this.getElement(i).getGamma() == Constants.INFINITY || this.getElement(i).getDelta() == 0) {
+                if (this.getCount() > 1) {
+                    this.popSome(i);
+                } else {
+                    result.r = new Monomial(0, 0);
+                    result.p = new Polynomial(new Monomial(Constants.INFINITY, Constants._INFINITY));
+                    result.q = new Polynomial(new Monomial(0, 0));
+                    result.canonical = true;
+                    return (result);
                 }
             }
         }
 
 
-        for (i = 0; i < poly1.getn(); i++) {
-            // on regarde si l'�oile d'un des ��ents vaut (delta)*
-            if (poly1.getpol(i).getg() == 0 && poly1.getpol(i).getd() > 0) {
-                result.r.init(0, infinity);
-                result.q.init(0, infinity);
-                result.p.init(infinity, _infinity);
-                result.canonise = 1;
+        for (i = 0; i < this.getCount(); i++) {
+            if (this.getElement(i).getGamma() == 0 && this.getElement(i).getDelta() > 0) {
+                result.r = new Monomial(0, Constants.INFINITY);
+                result.q = new Polynomial(new Monomial(0, Constants.INFINITY));
+                result.p = new Polynomial(new Monomial(Constants.INFINITY, Constants._INFINITY));
+                result.canonical = true;
 
-                return (result);  // on retourne (delta)*
+                return (result);
             }
 
 
-            if (poly1.getpol(i).getd() == infinity)  // on sauvegarde le nui associ��un taui=infinity
-            {
-                if (poly1.getpol(i).getg() < numax) numax = poly1.getpol(i).getg();
+            if (this.getElement(i).getDelta() == Constants.INFINITY) {
+                if (this.getElement(i).getGamma() < numax) {
+                    numax = this.getElement(i).getGamma();
+                }
             }
 
-        } // fin de la boucle for
+        }
 
+        if (numax != Constants.INFINITY) {
+            result.p = new Polynomial(new Monomial(0, 0));
 
-        // on traite les cas ou au moins 1 des taui vaut infinity
-        if (numax != infinity) {
-            result.p.init(0, 0);
-
-            for (i = 0; i < poly1.getn(); i++)  // pour chaque ��ent on �end jusqu'�numax si n��saire
-            {
+            for (i = 0; i < this.getCount(); i++) {
                 j = 1;
-                while (j * poly1.getpol(i).getg() < numax) {
-                    monome.init(j * poly1.getpol(i).getg(), j * poly1.getpol(i).getd());
-                    result.p.add(monome);
+                while (j * this.getElement(i).getGamma() < numax) {
+                    result.p.addElement(new Monomial(j * this.getElement(i).getGamma(), j * this.getElement(i).getDelta()));
                     j++;
                 }
 
             }
 
-            result.p.simpli();
-            result.q.init(numax, infinity);
-            result.r.init(0, infinity);
-            result.canonise = 1;
+            result.p.sortSimplify();
+            result.q = new Polynomial(new Monomial(numax, Constants.INFINITY));
+            result.r = new Monomial(0, Constants.INFINITY);
+            result.canonical = true;
             return (result);
-
         }
 
-        /*** Le cas non d����******/
-        // recherche de la plus petite pente ayant le plus petit nu
-        pente = infinity;
+        pente = Constants.INFINITY;
         nj = 0;
-        for (i = 0; i < poly1.getn(); i++)
-
-        {
-            pente1 = (double) poly1.getpol(i).getg() / poly1.getpol(i).getd();
+        for (i = 0; i < this.getCount(); i++) {
+            pente1 = (double) this.getElement(i).getGamma() / this.getElement(i).getDelta();
             if (pente1 < pente) {
                 pente = pente1;
 
@@ -228,160 +225,132 @@ public class Polynomial {
             }
         }
 
-        // on traite toutes les �oiles dont la pente est inf�ieure �la pente retenue ci dessus
-        rtemp.init(poly1.getpol(nj).getg(), poly1.getpol(nj).getd());
-        k1 = rtemp.getg() * rtemp.getd();
-
-        // on recherche tout d'abord le kmax qui est une borne sup de l'extension des polyn�es
-        // ceci reduit la taille du transitoire r�ultant
-
+        rtemp = new Monomial(this.getElement(nj).getGamma(), this.getElement(nj).getDelta());
+        k1 = rtemp.getGamma() * rtemp.getDelta();
         gammakmax = 0;
 
-        nb_pente_inferieure = 0; //pour savoir combien de monomes ont une pente inf�ieure
+        nb_lower_slope = 0;
+        tabki = new int[this.getCount()];
 
-        if ((tabki = new int[poly1.getn()]) == NULL) {
-            mem_limite l (13);
-            throw (l);
-        }
-        // on r�erve un tableau pour sauvegerder les ki pour chaque monome de pente < rtemp
 
-        for (i = 0; i < poly1.getn(); i++) {
-            pente1 = (double) poly1.getpol(i).getg() / poly1.getpol(i).getd();
+        for (i = 0; i < this.getCount(); i++) {
+            pente1 = (double) this.getElement(i).getGamma() / this.getElement(i).getDelta();
             if (pente1 > pente) {
-                ki = rtemp.getd() * poly1.getpol(i).getg() - rtemp.getg() * poly1.getpol(i).getd();
+                ki = rtemp.getDelta() * this.getElement(i).getGamma() - rtemp.getGamma() * this.getElement(i).getDelta();
 
-                kmin = MAX(k1, 0);
-                kmin = (long) ceil(((double) kmin) / ki);
+                kmin = Math.max(k1, 0);
+                kmin = (int) Math.ceil(((double) kmin) / ki);
 
-                a = (long) floor(((double) kmin * poly1.getpol(i).getg()) / rtemp.getg());
-                test1 = rtemp.getd() * a;
-                test2 = poly1.getpol(i).getd() * kmin;
+                a = (int) Math.floor(((double) kmin * this.getElement(i).getGamma()) / rtemp.getGamma());
+                test1 = rtemp.getDelta() * a;
+                test2 = this.getElement(i).getDelta() * kmin;
                 while (test1 >= test2 && kmin > 0) {
                     kmin--;
-                    a = (long) floor(((double) kmin * poly1.getpol(i).getg()) / rtemp.getg());
-                    test1 = (rtemp.getd() * a);
-                    test2 = (poly1.getpol(i).getd() * kmin);
+                    a = (int) Math.floor(((double) kmin * this.getElement(i).getGamma()) / rtemp.getGamma());
+                    test1 = (rtemp.getDelta() * a);
+                    test2 = (this.getElement(i).getDelta() * kmin);
                 }
 
                 kmin++;
-                gammakmin = kmin * poly1.getpol(i).getg();
+                gammakmin = kmin * this.getElement(i).getGamma();
 
                 if (gammakmin > gammakmax) gammakmax = gammakmin;
 
-                tabki[nb_pente_inferieure] = kmin;
-                nb_pente_inferieure++;
-
+                tabki[nb_lower_slope] = kmin;
+                nb_lower_slope++;
             }
         }
 
-        result.p.init(infinity, _infinity);
+        result.p = new Polynomial(new Monomial(Constants.INFINITY, Constants._INFINITY));
         result.r = rtemp;
-        result.q.init(0, 0);
+        result.q = new Polynomial(new Monomial(0, 0));
 
-        n = 0;  // indice pour tabki
-        if ((tabgd = new gd[gammakmax + 1]) == NULL) {
-            mem_limite l (14);
-            throw (l);
+        n = 0;
+        tabgd = new Monomial[gammakmax + 1];
+        for (i = 0; i < tabgd.length; ++i) {
+            tabgd[i] = epsilon;
         }
-        tabgd[0].init(0, 0);
+        tabgd[0] = new Monomial(0, 0);
 
-        for (i = 0; i < poly1.getn(); i++)     // on traite toutes les �oiles dont la pente est inf�ieure �la pente retenue ci dessus
+        for (i = 0; i < this.getCount(); i++) {
+            pente1 = (double) this.getElement(i).getGamma() / this.getElement(i).getDelta();
+            if (pente1 > pente) {
+                qtemp = new Polynomial(new Monomial(0, 0));
 
-        {
-            pente1 = (double) poly1.getpol(i).getg() / poly1.getpol(i).getd();
-            if (pente1 > pente) {    // on commence par �endre le polyn�e
-
-
-                qtemp.init(0, 0);
-
-                for (j = 1; j < (int) tabki[n]; j++) //tabki[n] contient le kmin correspondant
-                {
-                    monome.init(poly1.getpol(i).getg() * j, poly1.getpol(i).getd() * j);
-                    qtemp.add(monome);
+                for (j = 1; j < tabki[n]; j++) {
+                    qtemp.addElement(new Monomial(this.getElement(i).getGamma() * j, this.getElement(i).getDelta() * j));
                 }
-                n++;
-                // puis on fait le produit jusqu'�gammakmax c'est suffisant
 
-                for (j = 0; j < (int) qtemp.getn(); j++) {
-                    for (k = 0; k < (int) result.q.getn(); k++) {
-                        monome = otimes(qtemp.getpol(j), result.q.getpol(k));
-                        if (monome.getg() < gammakmax) {
-                            if (monome >= tabgd[monome.getg()]) tabgd[monome.getg()] = monome;
-                            else ;
-                        } else k = result.q.getn();
+                n++;
+
+                for (j = 0; j < qtemp.getCount(); j++) {
+                    for (k = 0; k < result.q.getCount(); k++) {
+                        Monomial monome = qtemp.getElement(j).otimes(result.q.getElement(k));
+                        if (monome.getGamma() < gammakmax) {
+                            if (monome.compareTo(tabgd[monome.getGamma()]) >= 0) tabgd[monome.getGamma()] = monome;
+                        } else k = result.q.getCount();
                     }
 
                 }
 
-                result.q = tabgd[0];
+                result.q = new Polynomial(tabgd[0]);
 
                 for (k = 1; k < gammakmax; k++) {
-                    if (tabgd[k] != epsilon) result.q.add(tabgd[k]);
+                    if (!tabgd[k].equals(epsilon)) result.q.addElement(tabgd[k]);
                 }
 
-                poly1.popj(i); // on ote l'��ent du polyn�e il est trait�		if ((int)i<nj) nj--;	//l'��ent nj est d�lac�si n�essaire
+                this.popSome(i);
                 i--;
+            }
+        }
 
+        result.q.sortSimplify();
 
-            } // fin du if sur la pente
-        } // fin du for sur i
-
-        delete[] tabgd;
-        delete[] tabki;
-
-
-        result.q.simpli();
-
-
-        //pente identique, il y a surement mieux �faire mais...
-
-        for (i = nj + 1; i < poly1.getn(); i++) // on commence au dela de nj
-        {
-            for (k = nj; k < (int) i; k++) {
-                if ((poly1.getpol(i).getg() % poly1.getpol(k).getg()) == 0) {
-                    poly1.popj(i); // on ote l'��ent du polynome car il sera domin�				if ((int)i<nj) nj--;	//l'��ent nj est d�lac�				i--;
-                    k = i; // on sort de la boucle for k
+        for (i = nj + 1; i < this.getCount(); i++) {
+            for (k = nj; k < i; k++) {
+                if ((this.getElement(i).getGamma() % this.getElement(k).getGamma()) == 0) {
+                    this.popSome(i);
+                    k = i;
                 }
             }
         }
 
 
-        for (i = nj + 1; i < poly1.getn(); i++) // on commence au dela de nj
-        // Calcul de la pente
-        {
-            result.r.init(lcm(result.r.getg(), poly1.getpol(i).getg()),
-                    lcm(result.r.getd(), poly1.getpol(i).getd()));
+        for (i = nj + 1; i < this.getCount(); i++) {
+            result.r = new Monomial(Tools.lcm(result.r.getGamma(), this.getElement(i).getGamma()),
+                    Tools.lcm(result.r.getDelta(), this.getElement(i).getDelta()));
 
         }
 
-        for (i = nj; i < poly1.getn(); i++) {      //reste ��endre chacun des ��ents autant que necesaire
+        for (i = nj; i < this.getCount(); i++) {
 
-            qtemp.init(0, 0);
-            ki = (long) (result.r.getg() / poly1.getpol(i).getg());
+            qtemp = new Polynomial(new Monomial(0, 0));
+            ki = result.r.getGamma() / this.getElement(i).getGamma();
 
-            for (j = 1; j < (int) ki; j++) {
-                monome.init(poly1.getpol(i).getg() * j, poly1.getpol(i).getd() * j);
-                qtemp.add(monome);
+            for (j = 1; j < ki; j++) {
+                qtemp.addElement(new Monomial(this.getElement(i).getGamma() * j, this.getElement(i).getDelta() * j));
             }
 
-            result.q = otimes(result.q, qtemp);
+            result.q = result.q.otimes(qtemp);
         }
 
-        result.canon();
-
+        result.canonize();
         return (result);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj != null && obj.getClass() != this.getClass()) return false;
+        if (obj != null && obj.getClass() != this.getClass())
+            return false;
 
         Polynomial poly2 = (Polynomial) obj;
         int i = 0;
-        if (poly2 == null || poly2.data.size() != data.size()) return false;
+        if (poly2 == null || poly2.data.size() != data.size())
+            return false;
         else
             while (i < this.getCount()) {
-                if (data.get(i) != poly2.data.get(i)) return false;
+                if (!data.get(i).equals(poly2.data.get(i)))
+                    return false;
                 ++i;
             }
         return true;
@@ -400,15 +369,38 @@ public class Polynomial {
     }
 
     public void pop() {
-        data.remove(data.size() - 1);
+        if (data.size() > 1) {
+            data.remove(data.size() - 1);
+        } else {
+            data = new ArrayList<Monomial>();
+            data.add(new Monomial());
+        }
     }
 
-    public void popSome(int n) {
-        data = new ArrayList<Monomial>(data.subList(0, data.size() - 1 - n));
+    public void popSome(int j) {
+        int n = data.size();
+        if (data.size() > 0) {
+            if (j < (n - 1)) for (int i = j; i < (n - 1); i++) data.set(i, data.get(i + 1));
+            if (j < n) pop();
+        }
     }
 
     public Polynomial getRange(int start, int end) {
-        return new Polynomial((ArrayList<Monomial>) this.data.subList(start, end));
+        ArrayList<Monomial> list = new ArrayList<Monomial>(end - start + 5);
+        for (int i = start; i < end; ++i) {
+            list.add(this.data.get(i));
+        }
+        if (list.size() > 0) {
+            return new Polynomial(list);
+        } else {
+            return new Polynomial(new Monomial());
+        }
     }
 
+    @Override
+    public int hashCode() {
+        int result = data != null ? data.hashCode() : 0;
+        result = 31 * result + (simple ? 1 : 0);
+        return result;
+    }
 }
