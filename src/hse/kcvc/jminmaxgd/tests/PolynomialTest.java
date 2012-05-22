@@ -1,5 +1,7 @@
-package hse.kcvc.jminmaxgd;
+package hse.kcvc.jminmaxgd.tests;
 
+import hse.kcvc.jminmaxgd.Monomial;
+import hse.kcvc.jminmaxgd.Polynomial;
 import org.junit.Test;
 
 import java.util.ArrayList;
