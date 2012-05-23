@@ -1,10 +1,22 @@
 package hse.kcvc.jminmaxgd;
 
 /**
- * User: Kouprianov Maxim
- * Date: 10.04.12
- * Time: 14:02
- * Contact: me@kc.vc
+ * Создал: Максим Куприянов,
+ * 272ПИ, НИУ-ВШЭ
+ *
+ * Проект: Курсовая работа 2011-2012гг
+ *
+ * Тема: "Программа выполнения операций в
+ * идемпотентном полукольце конус-ограниченных
+ * множеств."
+ *
+ * Программа: libMinMaxGD
+ *
+ * Связь: me@kc.vc
+ */
+
+/**
+ * Класс констант для внутреннего пользования
  */
 class Constants {
     public final static int INFINITY = Integer.MAX_VALUE;

@@ -2,31 +2,68 @@ package hse.kcvc.jminmaxgd;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
- * User: Kouprianov Maxim
- * Date: 10.04.12
- * Time: 14:01
- * Contact: me@kc.vc
+ * Создал: Максим Куприянов,
+ * 272ПИ, НИУ-ВШЭ
+ *
+ * Проект: Курсовая работа 2011-2012гг
+ *
+ * Тема: "Программа выполнения операций в
+ * идемпотентном полукольце конус-ограниченных
+ * множеств."
+ *
+ * Программа: libMinMaxGD
+ *
+ * Связь: me@kc.vc
+ */
+
+/**
+ * Класс для представления полинома в алгебре MinMaxGD.
+ * <p/>
+ * Содержит реализацию базовых операций:
+ * сложение, умножение, звезда Клини.
  */
 public class Polynomial {
     private ArrayList<Monomial> data;
 
+    /**
+     * Проверка является ли текущая
+     * форма полинома минимальной
+     *
+     * @return true, если минимальная, false иначе
+     */
     public boolean isSimple() {
         return simple;
     }
 
     private boolean simple;
 
+    /**
+     * Сортировка элементов полинома по возрастанию
+     */
     void sort() {
         Collections.sort(data);
         Collections.reverse(data);
     }
 
+    /**
+     * Подсчёт количества слагаемых в полиноме
+     *
+     * @return количество
+     */
     public int getCount() {
         return data.size();
     }
 
+    /**
+     * Получить элемент полинома по заданному
+     * порядковому номеру
+     *
+     * @param n номер (отсчёт с нуля)
+     * @return соответствующий моном
+     */
     public Monomial getElement(int n) {
         if (n < 0 || n >= data.size()) {
             return new Monomial();
@@ -34,11 +71,25 @@ public class Polynomial {
         return data.get(n);
     }
 
+    /**
+     * Заменить элемент полинома по заданному
+     * порядковому номеру
+     *
+     * @param n  номер (отсчёт с нуля)
+     * @param gd моном, который нкжно поместить под номером n
+     */
     public void setElement(int n, Monomial gd) {
         data.set(n, gd);
     }
 
-    public Polynomial(final ArrayList<Monomial> list) {
+    /**
+     * Конструктор - инициализация полинома
+     * по массиву слагаемых [m1, m2, ..., mn]:
+     * p = m1 + m2 + m3 + ... + mn
+     *
+     * @param list массив мономов
+     */
+    public Polynomial(List<Monomial> list) {
         this();
 
         if (list.size() >= 1) {
@@ -48,6 +99,12 @@ public class Polynomial {
         }
     }
 
+    /**
+     * Конструктор копирования - делает глубокую
+     * копию указанного прототипа
+     *
+     * @param p2 прототип для копирования
+     */
     public Polynomial(Polynomial p2) {
         this();
 
@@ -55,18 +112,33 @@ public class Polynomial {
         this.simple = p2.simple;
     }
 
+    /**
+     * Пустой контсруктор - пустой полином
+     * p = epsilon
+     */
     public Polynomial() {
         this.data = new ArrayList<Monomial>(Constants.POLY_SIZE);
         this.data.add(new Monomial());
         this.simple = true;
     }
 
+    /**
+     * Конструктор - инициализация
+     * полинома с одним элементом
+     * p = gd
+     *
+     * @param gd элемент
+     */
     public Polynomial(final Monomial gd) {
         this.data = new ArrayList<Monomial>(Constants.POLY_SIZE);
         this.data.add(gd);
         this.simple = true;
     }
 
+    /**
+     * Сортировка, а затем
+     * упрощение формы полинома
+     */
     public void sortSimplify() {
         if (simple) return;
         if (data != null) {
@@ -75,7 +147,11 @@ public class Polynomial {
         }
     }
 
-    void simplify() {
+    /**
+     * Сам метод упрощения (при условии,
+     * что элементы полинома отсортированы по-возрастанию)
+     */
+    private void simplify() {
         if (data != null) {
             int i = 0;
             for (int j = 1; j < data.size(); ++j) {
@@ -91,6 +167,12 @@ public class Polynomial {
         }
     }
 
+    /**
+     * Добавление слагамеого в полином
+     * без упрощения результата
+     *
+     * @param gd моном для добавления
+     */
     public void addElement(final Monomial gd) {
         if (data.size() > 1) {
             data.add(gd);
@@ -104,6 +186,13 @@ public class Polynomial {
         this.simple = false;
     }
 
+    /**
+     * Вычисление суммы полиномов
+     * p = this + poly2
+     *
+     * @param poly2 слагаемое
+     * @return новый полином - сумма двух
+     */
     public Polynomial oplus(final Polynomial poly2) {
         ArrayList<Monomial> list = new ArrayList<Monomial>(data);
         list.addAll(poly2.data);
@@ -111,6 +200,13 @@ public class Polynomial {
         return new Polynomial(list);
     }
 
+    /**
+     * Вычисление суммы
+     * p = this + gd
+     *
+     * @param gd слагаемое
+     * @return новый полином - сумма исходного с мономом
+     */
     public Polynomial oplus(final Monomial gd) {
         Polynomial result = new Polynomial(data);
         result.addElement(gd);
@@ -119,6 +215,13 @@ public class Polynomial {
         return result;
     }
 
+    /**
+     * Вычисление произведения двух полиномов
+     * p = this * poly2
+     *
+     * @param poly2 сомножитель
+     * @return новый полином - произведение двух
+     */
     public Polynomial otimes(Polynomial poly2) {
         ArrayList<Monomial> result;
         result = new ArrayList<Monomial>(this.data.size() * poly2.data.size());
@@ -129,10 +232,23 @@ public class Polynomial {
         return new Polynomial(result);
     }
 
+    /**
+     * Вычисление произведения
+     * полинома и произвольного монома
+     * p = this * gd
+     *
+     * @param gd сомножитель
+     * @return новый полином - произведение
+     */
     public Polynomial otimes(Monomial gd) {
         return new Polynomial(gd).otimes(this);
     }
 
+    /**
+     * Звезда Клини
+     *
+     * @return p = (this)*
+     */
     public Series star() {
 
         int i, k1;
@@ -338,6 +454,12 @@ public class Polynomial {
         return (result);
     }
 
+    /**
+     * Проверяет равенство полиномов
+     *
+     * @param obj полином для сравнения
+     * @return true если равны, false иначе
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj != null && obj.getClass() != this.getClass())
@@ -356,6 +478,12 @@ public class Polynomial {
         return true;
     }
 
+    /**
+     * Преобразует полином в сроку,
+     * которую можно вывести для отладки
+     *
+     * @return обычная строка
+     */
     @Override
     public String toString() {
         int last = data.size() - 1;
@@ -368,6 +496,10 @@ public class Polynomial {
         return out;
     }
 
+    /**
+     * Удаление последнего
+     * слагаемого полинома
+     */
     public void pop() {
         if (data.size() > 1) {
             data.remove(data.size() - 1);
@@ -377,6 +509,12 @@ public class Polynomial {
         }
     }
 
+    /**
+     * Удаление j последних
+     * слагаемых полинома
+     *
+     * @param j кол-во слагаемых для удаления
+     */
     public void popSome(int j) {
         int n = data.size();
         if (data.size() > 0) {
@@ -385,6 +523,14 @@ public class Polynomial {
         }
     }
 
+    /**
+     * Получение полинома, который содержит
+     * диапазон мономов другого полинома
+     *
+     * @param start позиция для начала
+     * @param end   позиция конца
+     * @return новый полином размера (end - start) слагаемых
+     */
     public Polynomial getRange(int start, int end) {
         end++;
         ArrayList<Monomial> list = new ArrayList<Monomial>(end - start + 5);
@@ -405,6 +551,13 @@ public class Polynomial {
         return result;
     }
 
+
+    /**
+     * Метод для получения коллеции
+     * мономов полинома
+     *
+     * @return коллекция мономов в полиноме
+     */
     public ArrayList<Monomial> getData() {
         return data;
     }

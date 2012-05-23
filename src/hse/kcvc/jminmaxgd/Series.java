@@ -4,10 +4,26 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * User: Kouprianov Maxim
- * Date: 10.04.12
- * Time: 14:01
- * Contact: me@kc.vc
+ * Создал: Максим Куприянов,
+ * 272ПИ, НИУ-ВШЭ
+ *
+ * Проект: Курсовая работа 2011-2012гг
+ *
+ * Тема: "Программа выполнения операций в
+ * идемпотентном полукольце конус-ограниченных
+ * множеств."
+ *
+ * Программа: libMinMaxGD
+ *
+ * Связь: me@kc.vc
+ */
+
+/**
+ * Класс для представления периодических рядов
+ * вида s = p + qr* в алгебре MinMaxGD.
+ * <p/>
+ * Содержит реализацию базовых операций:
+ * сложение, умножение, звезда Клини.
  */
 public class Series {
     Polynomial p;
@@ -15,34 +31,75 @@ public class Series {
     Monomial r;
     boolean canonical;
 
+    /**
+     * Проверка на каноничность
+     *
+     * @return true, если ряд в каноническом виде, false иначе
+     */
     public boolean isCanonical() {
         return canonical;
     }
 
+    /**
+     * Получает полином p
+     *
+     * @return p
+     */
     public Polynomial getP() {
         return p;
     }
 
+    /**
+     * Получает полином q
+     *
+     * @return q
+     */
     public Polynomial getQ() {
         return q;
     }
 
+    /**
+     * Получает моном r
+     *
+     * @return r
+     */
     public Monomial getR() {
         return r;
     }
 
+    /**
+     * Пустой конструктор,
+     * инициализирует ряд вида
+     * s = epsilon + epsilon (0,0)*
+     */
     public Series() {
-        //s = epsilon + epsilon (0,0)*
         this.p = new Polynomial(new Monomial());
         this.q = new Polynomial(new Monomial());
         this.r = new Monomial(0, 0);
         this.canonical = false;
     }
 
+    /**
+     * Почленный конструктор - задаются
+     * полиномы p, q и моном r
+     *
+     * @param p
+     * @param q
+     * @param r
+     */
     public Series(Polynomial p, Polynomial q, Monomial r) {
         this(p, q, r, false);
     }
 
+    /**
+     * Почленный конструктор для внутреннего использования,
+     * предполагает возможность явной установки каноничности.
+     *
+     * @param p
+     * @param q
+     * @param r
+     * @param canonical каноническая форма
+     */
     private Series(Polynomial p, Polynomial q, Monomial r, boolean canonical) {
         if (r.getDelta() < 0 || r.getGamma() < 0) {
             throw (new ArithmeticException("r must have positive shifts"));
@@ -54,6 +111,11 @@ public class Series {
         this.canonical = canonical;
     }
 
+    /**
+     * Конструктор ряда по полиному
+     *
+     * @param p полином
+     */
     private Series(Polynomial p) {
         p.sortSimplify();
 
@@ -65,6 +127,11 @@ public class Series {
 
     }
 
+    /**
+     * Конструктор копирования прототипа
+     *
+     * @param s2 прототип
+     */
     private Series(Series s2) {
         this.p = new Polynomial(s2.p);
         this.q = new Polynomial(s2.q);
@@ -72,6 +139,11 @@ public class Series {
         this.canonical = s2.canonical;
     }
 
+    /**
+     * Конструктор ряда по одному лишь моному
+     *
+     * @param gd
+     */
     public Series(Monomial gd) {
         this.p = new Polynomial();
         this.q = new Polynomial(gd);
@@ -79,6 +151,9 @@ public class Series {
         this.canonical = true;
     }
 
+    /**
+     * Приводит ряд в каноническую форму
+     */
     public void canonize() {
         Monomial epsilon = new Monomial();
         Monomial Top = new Monomial(Constants._INFINITY, Constants.INFINITY);
@@ -290,6 +365,13 @@ public class Series {
         this.canonical = true;
     }
 
+    /**
+     * Вычисление суммы двух рядов
+     * s = this + s2
+     *
+     * @param s2 слагаемое
+     * @return новый ряд - сумма исходного со вторым
+     */
     Series oplus(Series s2) {
         int j;
         Series result;
@@ -464,6 +546,14 @@ public class Series {
         return (result);
     }
 
+    /**
+     * Вычисление произведения ряда с мономом
+     * s = this x gd2
+     *
+     * @param gd2 сомножитель
+     * @return новый ряд - произведение
+     *         исходного с мономом
+     */
     public Series otimes(Monomial gd2) {
         Series s2 = new Series();
         s2.p = new Polynomial(new Monomial());
@@ -473,6 +563,14 @@ public class Series {
         return (this.otimes(s2));
     }
 
+    /**
+     * Вычисление произведения ряда с полиномом
+     * s = this x p2
+     *
+     * @param p2 сомножитель
+     * @return новый ряд - произведение
+     *         исходного с полиномом
+     */
     Series otimes(Polynomial p2) {
         Series s2 = new Series();
         s2.p = p2;
@@ -483,6 +581,14 @@ public class Series {
         return (this.otimes(s2));
     }
 
+    /**
+     * Вычисление суммы ряда с мономом
+     * s = this + gd2
+     *
+     * @param gd2 слагаемое
+     * @return новый ряд - сумма
+     *         исходного с мономом
+     */
     Series oplus(Monomial gd2) {
         Series s2 = new Series();
         s2.p = new Polynomial(new Monomial());
@@ -492,6 +598,14 @@ public class Series {
         return (this.oplus(s2));
     }
 
+    /**
+     * Вычисление суммы ряда с полиномом
+     * s = this + p2
+     *
+     * @param p2 слагаемое
+     * @return новый ряд - сумма
+     *         исходного с полиномом
+     */
     public Series oplus(Polynomial p2) {
         Series s2 = new Series();
         s2.p = p2;
@@ -502,6 +616,13 @@ public class Series {
         return (this.oplus(s2));
     }
 
+    /**
+     * Вычисление произведения двух рядов
+     * s = this + s2
+     *
+     * @param s2 сомножитель
+     * @return новый ряд - произведение исходного со вторым
+     */
     public Series otimes(Series s2) {
         Series ads1 = this;
         Series ads2 = s2;
@@ -665,6 +786,11 @@ public class Series {
         return (result);
     }
 
+    /**
+     * Звезда Клини
+     *
+     * @return s = (this)*
+     */
     public Series star() {
         Series operation, result, temp;
         Monomial monome;
@@ -687,6 +813,12 @@ public class Series {
         return (result);
     }
 
+    /**
+     * Преобразует ряд в сроку,
+     * которую можно вывести для отладки
+     *
+     * @return обычная строка
+     */
     @Override
     public String toString() {
         String flot = "";
@@ -695,6 +827,12 @@ public class Series {
         return flot;
     }
 
+    /**
+     * Проверяет равенство с другим рядом
+     *
+     * @param o ряд для проверки
+     * @return true, если равны, false иначе
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

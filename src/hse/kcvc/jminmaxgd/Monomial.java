@@ -1,26 +1,50 @@
 package hse.kcvc.jminmaxgd;
 
 /**
- * User: Kouprianov Maxim
- * Date: 10.04.12
- * Time: 13:57
- * Contact: me@kc.vc
+ * Создал: Максим Куприянов,
+ * 272ПИ, НИУ-ВШЭ
+ *
+ * Проект: Курсовая работа 2011-2012гг
+ *
+ * Тема: "Программа выполнения операций в
+ * идемпотентном полукольце конус-ограниченных
+ * множеств."
+ *
+ * Программа: libMinMaxGD
+ *
+ * Связь: me@kc.vc
+ */
+
+/**
+ * Класс для представления монома в алгебре MinMaxGD.
+ * <p/>
+ * Содержит реализацию базовых операций:
+ * сложение, умножение, звезда Клини.
  */
 public class Monomial implements Comparable<Monomial> {
     final private int g;
     final private int d;
 
-
+    /**
+     * Получить сдвиг по счётчику
+     *
+     * @return gamma
+     */
     public int getGamma() {
         return g;
     }
 
+    /**
+     * Получить сдвиг по времени
+     *
+     * @return delta
+     */
     public int getDelta() {
         return d;
     }
 
     /**
-     * Constructor 0: (g,d) = (+∞,-∞)
+     * Пустой конструктор - эпсилон = (∞, -∞)
      */
     public Monomial() {
         this.g = Constants.INFINITY;
@@ -28,9 +52,9 @@ public class Monomial implements Comparable<Monomial> {
     }
 
     /**
-     * Constructor 1: initialize by prototype
+     * Конструктор копирования прототипа
      *
-     * @param gd Target Monomial to copy from
+     * @param gd Целевой прототип для копирования
      */
     public Monomial(final Monomial gd) {
         this.g = gd.g;
@@ -38,16 +62,22 @@ public class Monomial implements Comparable<Monomial> {
     }
 
     /**
-     * Constructor 2: initialize by two integers
+     * Конструктор инициализации по счётчико-времени
      *
-     * @param g Gamma to set
-     * @param d Delta to set
+     * @param g Gamma счётчик
+     * @param d Delta время
      */
     public Monomial(final int g, final int d) {
         this.g = g;
         this.d = d;
     }
 
+    /**
+     * Сравнение с другим мономом
+     *
+     * @param gd2 другой моном для сравнения
+     * @return 1 если больше другого, 0 если равны, -1 иначе
+     */
     public int compareTo(Monomial gd2) {
         if (this.g == gd2.g && this.d == gd2.d)
             return 0;
@@ -60,22 +90,12 @@ public class Monomial implements Comparable<Monomial> {
 
     }
 
-    public Monomial inf(final Monomial gd2) {
-        final int g, d;
-        if (gd2.g > this.g)
-            g = gd2.g;
-        else
-            g = Constants.INFINITY;
-
-        if (gd2.d < this.d)
-            d = gd2.d;
-        else
-            d = Constants._INFINITY;
-
-
-        return new Monomial(g, d);
-    }
-
+    /**
+     * Умножение мономов
+     *
+     * @param gd2 сомножитель
+     * @return произведение m = this x gd2
+     */
     public Monomial otimes(final Monomial gd2) {
         final int g, d;
         if (this.g == Constants._INFINITY || gd2.g == Constants._INFINITY)
@@ -94,6 +114,11 @@ public class Monomial implements Comparable<Monomial> {
         return new Monomial(g, d);
     }
 
+    /**
+     * Звезда Клини
+     *
+     * @return m = (this)*
+     */
     public Series star() {
         Series result = new Series();
 
@@ -121,59 +146,24 @@ public class Monomial implements Comparable<Monomial> {
         return (result);
     }
 
-    public Monomial frac(final Monomial gd2) {
-        final int g, d;
-        switch (this.g) {
-            case Constants._INFINITY:
-                g = Constants._INFINITY;
-                break;
-            case Constants.INFINITY:
-                if (gd2.g == Constants.INFINITY) g = Constants._INFINITY;
-                else g = Constants.INFINITY;
-                break;
-            default:
-                switch (gd2.g) {
-                    case Constants.INFINITY:
-                        g = Constants._INFINITY;
-                        break;
-                    case Constants._INFINITY:
-                        g = Constants.INFINITY;
-                        break;
-                    default:
-                        g = this.g - gd2.g;
-                }
-        }
-
-        switch (this.d) {
-            case Constants.INFINITY:
-                d = Constants.INFINITY;
-                break;
-            case Constants._INFINITY:
-                if (gd2.d == Constants._INFINITY) d = Constants.INFINITY;
-                else d = Constants._INFINITY;
-                break;
-            default:
-                switch (gd2.d) {
-                    case Constants._INFINITY:
-                        d = Constants.INFINITY;
-                        break;
-                    case Constants.INFINITY:
-                        d = Constants._INFINITY;
-                        break;
-                    default:
-                        d = this.d - gd2.d;
-                }
-        }
-
-        return new Monomial(g, d);
-    }
-
+    /**
+     * Преобразует моном в сроку,
+     * которую можно вывести для отладки
+     *
+     * @return обычная строка
+     */
     @Override
     public String toString() {
         return " g^" + ((this.g == Constants.INFINITY) ? ("inf") : ((this.g == Constants._INFINITY) ? ("-inf") : ("" + this.g)))
                 + " d^" + ((this.d == Constants.INFINITY) ? ("inf") : ((this.d == Constants._INFINITY) ? ("-inf") : ("" + this.d)));
     }
 
+    /**
+     * Проверяет равенство с другим мономом
+     *
+     * @param o моном для проверки
+     * @return true, если равны, false иначе
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
