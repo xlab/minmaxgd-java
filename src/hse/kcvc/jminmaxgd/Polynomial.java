@@ -386,6 +386,7 @@ public class Polynomial {
     }
 
     public Polynomial getRange(int start, int end) {
+        end++;
         ArrayList<Monomial> list = new ArrayList<Monomial>(end - start + 5);
         for (int i = start; i < end; ++i) {
             list.add(this.data.get(i));

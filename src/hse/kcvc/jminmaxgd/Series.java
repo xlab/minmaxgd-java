@@ -33,6 +33,8 @@ public class Series {
 
     public Series() {
         //s = epsilon + epsilon (0,0)*
+        this.p = new Polynomial(new Monomial());
+        this.q = new Polynomial(new Monomial());
         this.r = new Monomial(0, 0);
         this.canonical = false;
     }
@@ -59,6 +61,8 @@ public class Series {
         this.q = new Polynomial(p.getElement(p.getCount() - 1));
         this.r = new Monomial(0, 0);
         this.canonical = true;
+
+
     }
 
     public Series(Series s2) {
@@ -685,11 +689,7 @@ public class Series {
 
     @Override
     public String toString() {
-        Monomial epsilon = new Monomial(0, 0);
         String flot = "";
-        /* if (!(this.p.equals(new Polynomial(epsilon)))) flot += this.p + "+";
-        if (!(this.q.equals(new Polynomial(epsilon)))) flot += "(" + this.q + ")[" + this.r + "]*";
-        else flot += "eps";   */
         flot += this.p + "+";
         flot += "(" + this.q + ")[" + this.r + "]*";
         return flot;

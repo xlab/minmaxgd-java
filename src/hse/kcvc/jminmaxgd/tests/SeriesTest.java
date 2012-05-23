@@ -55,6 +55,6 @@ public class SeriesTest {
         Series s1 = new Series(p1, q1, r1);
         Series s2 = new Series(p2, q2, r2);
 
-        System.out.println(s2.otimes(s1));
+        System.out.println(s1.otimes(s2));
     }
 }
