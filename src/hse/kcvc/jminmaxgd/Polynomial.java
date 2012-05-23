@@ -18,7 +18,7 @@ public class Polynomial {
 
     private boolean simple;
 
-    public void sort() {
+    void sort() {
         Collections.sort(data);
         Collections.reverse(data);
     }
@@ -75,7 +75,7 @@ public class Polynomial {
         }
     }
 
-    public void simplify() {
+    void simplify() {
         if (data != null) {
             int i = 0;
             for (int j = 1; j < data.size(); ++j) {
@@ -403,5 +403,9 @@ public class Polynomial {
         int result = data != null ? data.hashCode() : 0;
         result = 31 * result + (simple ? 1 : 0);
         return result;
+    }
+
+    public ArrayList<Monomial> getData() {
+        return data;
     }
 }

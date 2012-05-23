@@ -178,13 +178,9 @@ public class Monomial implements Comparable<Monomial> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Monomial)) return false;
-
         Monomial monomial = (Monomial) o;
 
-        if (d != monomial.d) return false;
-        if (g != monomial.g) return false;
-
-        return true;
+        return d == monomial.d && g == monomial.g;
     }
 
     @Override

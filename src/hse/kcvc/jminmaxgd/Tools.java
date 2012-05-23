@@ -6,7 +6,7 @@ package hse.kcvc.jminmaxgd;
  * Time: 1:06
  * Contact: me@kc.vc
  */
-public class Tools {
+class Tools {
 
     public static int gcd(int a, int b) {
         int r;

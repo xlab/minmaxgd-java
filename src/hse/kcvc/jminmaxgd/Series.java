@@ -43,7 +43,7 @@ public class Series {
         this(p, q, r, false);
     }
 
-    public Series(Polynomial p, Polynomial q, Monomial r, boolean canonical) {
+    private Series(Polynomial p, Polynomial q, Monomial r, boolean canonical) {
         if (r.getDelta() < 0 || r.getGamma() < 0) {
             throw (new ArithmeticException("r must have positive shifts"));
         }
@@ -54,7 +54,7 @@ public class Series {
         this.canonical = canonical;
     }
 
-    public Series(Polynomial p) {
+    private Series(Polynomial p) {
         p.sortSimplify();
 
         this.p = p.getRange(0, p.getCount() - 2);
@@ -65,7 +65,7 @@ public class Series {
 
     }
 
-    public Series(Series s2) {
+    private Series(Series s2) {
         this.p = new Polynomial(s2.p);
         this.q = new Polynomial(s2.q);
         this.r = new Monomial(s2.r);
@@ -290,7 +290,7 @@ public class Series {
         this.canonical = true;
     }
 
-    public Series oplus(Series s2) {
+    Series oplus(Series s2) {
         int j;
         Series result;
         double slope1, slope2;
@@ -473,7 +473,7 @@ public class Series {
         return (this.otimes(s2));
     }
 
-    public Series otimes(Polynomial p2) {
+    Series otimes(Polynomial p2) {
         Series s2 = new Series();
         s2.p = p2;
         s2.q = new Polynomial(s2.p.getElement(s2.p.getCount() - 1));
@@ -483,7 +483,7 @@ public class Series {
         return (this.otimes(s2));
     }
 
-    public Series oplus(Monomial gd2) {
+    Series oplus(Monomial gd2) {
         Series s2 = new Series();
         s2.p = new Polynomial(new Monomial());
         s2.q = new Polynomial(new Monomial(gd2.getGamma(), gd2.getDelta()));
@@ -705,9 +705,8 @@ public class Series {
         if (canonical != series.canonical) return false;
         if (p != null ? !p.equals(series.p) : series.p != null) return false;
         if (q != null ? !q.equals(series.q) : series.q != null) return false;
-        if (r != null ? !r.equals(series.r) : series.r != null) return false;
+        return !(r != null ? !r.equals(series.r) : series.r != null);
 
-        return true;
     }
 
     @Override
