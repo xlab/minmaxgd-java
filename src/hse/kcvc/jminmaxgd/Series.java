@@ -107,9 +107,9 @@ public class Series {
             throw (new ArithmeticException("r must have positive shifts"));
         }
 
-        this.p = p;
-        this.q = q;
-        this.r = r;
+        this.p = new Polynomial(p);
+        this.q = new Polynomial(q);
+        this.r = new Monomial(r);
         this.canonical = canonical;
     }
 
@@ -119,6 +119,7 @@ public class Series {
      * @param p полином
      */
     public Series(Polynomial p) {
+        p = new Polynomial(p);
         p.sortSimplify();
 
         this.p = p.getRange(0, p.getCount() - 2);
@@ -798,9 +799,10 @@ public class Series {
         Monomial monome;
         result = new Series();
 
-        if (!this.canonical) this.canonize();
-
         operation = new Series(this);
+        if (!operation.canonical) operation.canonize();
+
+        
         monome = new Monomial(0, 0);
 
         result.q = operation.q.oplus(operation.r);
