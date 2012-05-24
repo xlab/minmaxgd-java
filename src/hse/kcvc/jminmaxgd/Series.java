@@ -855,4 +855,28 @@ public class Series {
         result = 31 * result + (canonical ? 1 : 0);
         return result;
     }
+    
+    public Series plus(Monomial gd2) {
+        return this.oplus(gd2);
+    }
+
+    public Series plus(Polynomial p2) {
+        return this.oplus(p2);
+    }
+
+    public Series plus(Series s2) {
+        return this.oplus(s2);
+    }
+
+    public Series multiply(Monomial gd2) {
+        return this.otimes(gd2);
+    }
+
+    public Series multiply(Polynomial p2) {
+        return this.otimes(p2);
+    }
+
+    public Series multiply(Series s2) {
+        return this.otimes(s2);
+    }
 }

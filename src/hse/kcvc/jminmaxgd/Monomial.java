@@ -179,4 +179,46 @@ public class Monomial implements Comparable<Monomial> {
         result = 31 * result + d;
         return result;
     }
+    
+    public Polynomial plus(Monomial gd2)
+    {
+        Polynomial result = new Polynomial(this);
+        result = result.oplus(gd2);
+        return result;
+    }
+    
+    public Polynomial plus(Polynomial p2)
+    {
+        Polynomial result = new Polynomial(this);
+        result = result.oplus(p2);
+        return result;
+    }
+    
+    public Series plus(Series s2)
+    {
+        Series result = new Series(this);
+        result = result.oplus(s2);
+        return result;
+    }
+    
+    public Polynomial multiply(Monomial gd2)
+    {
+        Polynomial result = new Polynomial(this);
+        result = result.otimes(gd2);
+        return result;
+    }
+    
+    public Polynomial multiply(Polynomial p2)
+    {
+        Polynomial result = new Polynomial(this);
+        result = result.otimes(p2);
+        return result;
+    }
+    
+    public Series multiply(Series s2)
+    {
+        Series result = new Series(this);
+        result = result.otimes(s2);
+        return result;
+    }
 }
