@@ -116,7 +116,7 @@ public class Series {
      *
      * @param p полином
      */
-    private Series(Polynomial p) {
+    public Series(Polynomial p) {
         p.sortSimplify();
 
         this.p = p.getRange(0, p.getCount() - 2);

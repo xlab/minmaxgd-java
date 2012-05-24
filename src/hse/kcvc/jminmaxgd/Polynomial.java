@@ -25,7 +25,7 @@ import java.util.List;
  * Содержит реализацию базовых операций:
  * сложение, умножение, звезда Клини.
  */
-public class Polynomial {
+public final class Polynomial {
     private ArrayList<Monomial> data;
 
     /**
@@ -262,13 +262,14 @@ public class Polynomial {
         double pente, pente1, test1, test2;
 
         Series result = new Series();
+        Polynomial operation = new Polynomial(this);
         Polynomial qtemp;
         Monomial epsilon = new Monomial();
 
 
-        this.sortSimplify();
+        operation.sortSimplify();
 
-        if (this.getElement(0).getGamma() == Constants._INFINITY) {
+        if (operation.getElement(0).getGamma() == Constants._INFINITY) {
             result.p = new Polynomial(new Monomial(Constants.INFINITY, Constants._INFINITY));
             result.q = new Polynomial(new Monomial(Constants._INFINITY, Constants.INFINITY));
             result.r = new Monomial(0, 0);
@@ -277,10 +278,10 @@ public class Polynomial {
         }
 
 
-        for (i = 0; i < this.getCount(); i++) {
-            if (this.getElement(i).getGamma() == Constants.INFINITY || this.getElement(i).getDelta() == 0) {
-                if (this.getCount() > 1) {
-                    this.popSome(i);
+        for (i = 0; i < operation.getCount(); i++) {
+            if (operation.getElement(i).getGamma() == Constants.INFINITY || operation.getElement(i).getDelta() == 0) {
+                if (operation.getCount() > 1) {
+                    operation.popSome(i);
                 } else {
                     result.r = new Monomial(0, 0);
                     result.p = new Polynomial(new Monomial(Constants.INFINITY, Constants._INFINITY));
@@ -292,8 +293,8 @@ public class Polynomial {
         }
 
 
-        for (i = 0; i < this.getCount(); i++) {
-            if (this.getElement(i).getGamma() == 0 && this.getElement(i).getDelta() > 0) {
+        for (i = 0; i < operation.getCount(); i++) {
+            if (operation.getElement(i).getGamma() == 0 && operation.getElement(i).getDelta() > 0) {
                 result.r = new Monomial(0, Constants.INFINITY);
                 result.q = new Polynomial(new Monomial(0, Constants.INFINITY));
                 result.p = new Polynomial(new Monomial(Constants.INFINITY, Constants._INFINITY));
@@ -303,9 +304,9 @@ public class Polynomial {
             }
 
 
-            if (this.getElement(i).getDelta() == Constants.INFINITY) {
-                if (this.getElement(i).getGamma() < numax) {
-                    numax = this.getElement(i).getGamma();
+            if (operation.getElement(i).getDelta() == Constants.INFINITY) {
+                if (operation.getElement(i).getGamma() < numax) {
+                    numax = operation.getElement(i).getGamma();
                 }
             }
 
@@ -314,10 +315,10 @@ public class Polynomial {
         if (numax != Constants.INFINITY) {
             result.p = new Polynomial(new Monomial(0, 0));
 
-            for (i = 0; i < this.getCount(); i++) {
+            for (i = 0; i < operation.getCount(); i++) {
                 j = 1;
-                while (j * this.getElement(i).getGamma() < numax) {
-                    result.p.addElement(new Monomial(j * this.getElement(i).getGamma(), j * this.getElement(i).getDelta()));
+                while (j * operation.getElement(i).getGamma() < numax) {
+                    result.p.addElement(new Monomial(j * operation.getElement(i).getGamma(), j * operation.getElement(i).getDelta()));
                     j++;
                 }
 
@@ -332,8 +333,8 @@ public class Polynomial {
 
         pente = Constants.INFINITY;
         nj = 0;
-        for (i = 0; i < this.getCount(); i++) {
-            pente1 = (double) this.getElement(i).getGamma() / this.getElement(i).getDelta();
+        for (i = 0; i < operation.getCount(); i++) {
+            pente1 = (double) operation.getElement(i).getGamma() / operation.getElement(i).getDelta();
             if (pente1 < pente) {
                 pente = pente1;
 
@@ -341,34 +342,34 @@ public class Polynomial {
             }
         }
 
-        rtemp = new Monomial(this.getElement(nj).getGamma(), this.getElement(nj).getDelta());
+        rtemp = new Monomial(operation.getElement(nj).getGamma(), operation.getElement(nj).getDelta());
         k1 = rtemp.getGamma() * rtemp.getDelta();
         gammakmax = 0;
 
         nb_lower_slope = 0;
-        tabki = new int[this.getCount()];
+        tabki = new int[operation.getCount()];
 
 
-        for (i = 0; i < this.getCount(); i++) {
-            pente1 = (double) this.getElement(i).getGamma() / this.getElement(i).getDelta();
+        for (i = 0; i < operation.getCount(); i++) {
+            pente1 = (double) operation.getElement(i).getGamma() / operation.getElement(i).getDelta();
             if (pente1 > pente) {
-                ki = rtemp.getDelta() * this.getElement(i).getGamma() - rtemp.getGamma() * this.getElement(i).getDelta();
+                ki = rtemp.getDelta() * operation.getElement(i).getGamma() - rtemp.getGamma() * operation.getElement(i).getDelta();
 
                 kmin = Math.max(k1, 0);
                 kmin = (int) Math.ceil(((double) kmin) / ki);
 
-                a = (int) Math.floor(((double) kmin * this.getElement(i).getGamma()) / rtemp.getGamma());
+                a = (int) Math.floor(((double) kmin * operation.getElement(i).getGamma()) / rtemp.getGamma());
                 test1 = rtemp.getDelta() * a;
-                test2 = this.getElement(i).getDelta() * kmin;
+                test2 = operation.getElement(i).getDelta() * kmin;
                 while (test1 >= test2 && kmin > 0) {
                     kmin--;
-                    a = (int) Math.floor(((double) kmin * this.getElement(i).getGamma()) / rtemp.getGamma());
+                    a = (int) Math.floor(((double) kmin * operation.getElement(i).getGamma()) / rtemp.getGamma());
                     test1 = (rtemp.getDelta() * a);
-                    test2 = (this.getElement(i).getDelta() * kmin);
+                    test2 = (operation.getElement(i).getDelta() * kmin);
                 }
 
                 kmin++;
-                gammakmin = kmin * this.getElement(i).getGamma();
+                gammakmin = kmin * operation.getElement(i).getGamma();
 
                 if (gammakmin > gammakmax) gammakmax = gammakmin;
 
@@ -388,13 +389,13 @@ public class Polynomial {
         }
         tabgd[0] = new Monomial(0, 0);
 
-        for (i = 0; i < this.getCount(); i++) {
-            pente1 = (double) this.getElement(i).getGamma() / this.getElement(i).getDelta();
+        for (i = 0; i < operation.getCount(); i++) {
+            pente1 = (double) operation.getElement(i).getGamma() / operation.getElement(i).getDelta();
             if (pente1 > pente) {
                 qtemp = new Polynomial(new Monomial(0, 0));
 
                 for (j = 1; j < tabki[n]; j++) {
-                    qtemp.addElement(new Monomial(this.getElement(i).getGamma() * j, this.getElement(i).getDelta() * j));
+                    qtemp.addElement(new Monomial(operation.getElement(i).getGamma() * j, operation.getElement(i).getDelta() * j));
                 }
 
                 n++;
@@ -415,36 +416,36 @@ public class Polynomial {
                     if (!tabgd[k].equals(epsilon)) result.q.addElement(tabgd[k]);
                 }
 
-                this.popSome(i);
+                operation.popSome(i);
                 i--;
             }
         }
 
         result.q.sortSimplify();
 
-        for (i = nj + 1; i < this.getCount(); i++) {
+        for (i = nj + 1; i < operation.getCount(); i++) {
             for (k = nj; k < i; k++) {
-                if ((this.getElement(i).getGamma() % this.getElement(k).getGamma()) == 0) {
-                    this.popSome(i);
+                if ((operation.getElement(i).getGamma() % operation.getElement(k).getGamma()) == 0) {
+                    operation.popSome(i);
                     k = i;
                 }
             }
         }
 
 
-        for (i = nj + 1; i < this.getCount(); i++) {
-            result.r = new Monomial(Tools.lcm(result.r.getGamma(), this.getElement(i).getGamma()),
-                    Tools.lcm(result.r.getDelta(), this.getElement(i).getDelta()));
+        for (i = nj + 1; i < operation.getCount(); i++) {
+            result.r = new Monomial(Tools.lcm(result.r.getGamma(), operation.getElement(i).getGamma()),
+                    Tools.lcm(result.r.getDelta(), operation.getElement(i).getDelta()));
 
         }
 
-        for (i = nj; i < this.getCount(); i++) {
+        for (i = nj; i < operation.getCount(); i++) {
 
             qtemp = new Polynomial(new Monomial(0, 0));
-            ki = result.r.getGamma() / this.getElement(i).getGamma();
+            ki = result.r.getGamma() / operation.getElement(i).getGamma();
 
             for (j = 1; j < ki; j++) {
-                qtemp.addElement(new Monomial(this.getElement(i).getGamma() * j, this.getElement(i).getDelta() * j));
+                qtemp.addElement(new Monomial(operation.getElement(i).getGamma() * j, operation.getElement(i).getDelta() * j));
             }
 
             result.q = result.q.otimes(qtemp);
